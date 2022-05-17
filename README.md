@@ -4,7 +4,7 @@
 
 <br>
 
-### Currently this library has only been tested on 3.9
+### Currently this library has only been tested on Python 3.9
 
 ---
 
