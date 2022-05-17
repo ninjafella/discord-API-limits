@@ -1,6 +1,6 @@
 # discord_limits
 
-### This is a small library that allows you to easily make requests API requests to Discord without having to worry about ratelimits.
+### A simple library to asynchronously make API requests to Discord without having to worry about ratelimits.
 
 <br>
 
@@ -17,8 +17,13 @@ import os
 client = discord_limits.DiscordClient(os.environ.get('TOKEN'))
 
 channel_id = 123456789012345678
-client.send_message(channel_id, content="Hello, world!")
+await client.send_message(channel_id, content="Hello, world!")
 ```
+
+---
+### Requires:
+- [aiolimiter](https://pypi.org/project/aiolimiter/)
+- [aiohttp](https://pypi.org/project/aiohttp/)
 
 ---
 ### Based off of:
