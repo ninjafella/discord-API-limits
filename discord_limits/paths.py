@@ -338,8 +338,8 @@ class Paths:
         return await self._request('DELETE', path, bucket)
 
     async def get_reactions(self, channel_id: int, message_id: int, emoji: str, limit: int = 25, after: int = None) -> dict:
-        """_summary_
-            Get a list of users that reacted with this emoji.
+        """Get a list of users that reacted with this emoji.
+
         Parameters
         ----------
         channel_id : int
@@ -1734,8 +1734,8 @@ class Paths:
         path = f'/invites/{invite_id}'
         bucket = 'GET' + path
         params = {
-            'with_counts'(with_counts),
-            'with_expiration'(with_expiration),
+            'with_counts': with_counts,
+            'with_expiration': with_expiration,
         }
 
         if guild_scheduled_event_id:

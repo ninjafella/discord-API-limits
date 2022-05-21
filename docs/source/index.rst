@@ -1,5 +1,5 @@
 Welcome to discord_limits' documentation!
-==========================================
+=========================================
 
 Guide
 ^^^^^
@@ -23,8 +23,6 @@ Indices and tables
 
 Currently this library has only been tested on Python 3.9
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
---------------
 
 Basic usage
 ===========
