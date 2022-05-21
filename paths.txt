@@ -6,38 +6,11 @@ ISO8601_timestamp = TypeVar('ISO8601_timestamp')
 
 class Paths:
 
-    # Check for 'raise' statements
-
     """
     Audit Log
     """
 
     async def get_audit_logs(self, guild_id: int, limit = 50, before = None, user_id = None, action_type = None) -> dict:
-        """Get the audit logs for a guild.
-
-        Parameters
-        ----------
-        guild_id : int
-            The ID of the guild.
-        limit : int
-            The number of entries to return.
-        before : int
-            Entries that preceded a specific audit log entry ID
-        user_id : int
-            The ID of the user to filter the logs by.
-        action_type : int
-            The type of action to filter the logs by.
-
-        Returns
-        -------
-        dict
-            List of audit logs.
-        
-        Raises
-        ------
-        InvalidParams
-            The limit is not between 1 and 100.
-        """
         if 1 > limit or limit > 100:
             raise InvalidParams('limit must be between 1 and 100')
 
@@ -59,37 +32,11 @@ class Paths:
     """
 
     async def get_channel(self, channel_id: int) -> dict:
-        """Get a channel by ID.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel you wish to get information about.
-
-        Returns
-        -------
-        dict
-            Channel information.
-        """
         path = f'/channels/{channel_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
-    async def edit_channel(self, channel_id: int, *, reason: Optional[str] = None, **options: Any) -> dict:
-        """Update a channel's settings.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel you wish to edit.
-        reason : Optional[str], optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            A dict containing a channel object.
-        """
+    async def edit_channel(self, channel_id: int, DM: bool = False, *, reason: Optional[str] = None, **options: Any) -> dict:
         path = f'/channels/{channel_id}'
         bucket = 'PATCH' + path
         valid_keys = (
@@ -116,54 +63,15 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_channel(self, channel_id: int, reason: str = None) -> dict:
-        """Delete a channel, or close a private message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to be deleted/closed.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            Responce from Discord.
-        """
         path = f'/channels/{channel_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
         
     async def get_channel_messages(self, channel_id: int, limit=50, before: int = None, after: int = None, around: int = None) -> dict:
-        """Get messages from a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get message from
-        limit : int, optional
-            Max number of messages to return (1-100), by default 50
-        before : int, optional
-            Get messages before this message ID, by default None
-        after : int, optional
-            Get messages after this message ID, by default None
-        around : int, optional
-            Get messages around this message ID, by default None
-
-        Returns
-        -------
-        dict
-            List of message objects.
-
-        Raises
-        ------
-        InvalidParams
-            The limit is not between 1 and 100.
-        """
-        if 1 > limit or limit > 100:
-            raise InvalidParams('limit must be between 1 and 100')
         path = f'/channels/{channel_id}/messages'
         bucket = 'GET' + path
+        if 1 > limit or limit > 100:
+            raise InvalidParams('limit must be between 1 and 100')
         
         params = {
             'limit': limit,
@@ -179,60 +87,16 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
     
     async def get_message(self, channel_id: int, message_id: int) -> dict:
-        """Get a message from a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get message from.
-        message_id : int
-            The ID of the message that is to be retrieved.
-
-        Returns
-        -------
-        dict
-            A message object.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def create_message(self, channel_id: int, content: str = None, tts: bool = None, embeds: List[dict] = None, allowed_mentions: Any = None, message_reference: Any = None, components: List[Any] = None, sticker_ids: List[int] = None) -> dict:
-        """Post a message to a guild text or DM channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to send a message to.
-        content : str, optional
-            Message contents (up to 2000 characters), by default None
-        tts : bool, optional
-            true if this is a TTS message, by default None
-        embeds : List[dict], optional
-            An array of dicts containing embed data, by default None
-        allowed_mentions : Any, optional
-            Allowed mentions for the message, by default None
-        message_reference : Any, optional
-            Include to make your message a reply, by default None
-        components : List[Any], optional
-            An array of components to include with the message, by default None
-        sticker_ids : List[int], optional
-            IDs of up to 3 stickers in the server to send in the message, by default None
-
-        Returns
-        -------
-        dict
-            A message object 
-
-        Raises
-        ------
-        InvalidParams
-            content, embeds or sticker_ids must be provided.
-        """        
-        if content is None and embeds is None and sticker_ids is None:
-            raise InvalidParams('content, embeds or sticker_ids must be provided')
         path = f'/channels/{channel_id}/messages'
         bucket = 'POST' + path
+
+        if content is None and embeds is None and sticker_ids is None:
+            raise InvalidParams('content, embeds or sticker_ids must be provided')
 
         payload = {}
 
@@ -254,110 +118,26 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload)
 
     async def crosspost_message(self, channel_id: int, message_id: int) -> dict:
-        """Crosspost a message in a News Channel to following channels.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message to be corssposted is in.
-        message_id : int
-            The ID of the message to be crossposted.
-
-        Returns
-        -------
-        dict
-            A message object.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/crosspost'
         bucket = 'POST' + path
         return await self._request('POST', path, bucket)
 
     async def add_reaction(self, channel_id: int, message_id: int, emoji: str) -> dict:
-        """Create a reaction for a message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to add a reaction to.
-        emoji : str
-            The emoji to react with.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me'
         bucket = 'PUT' + path
         return await self._request('PUT', path, bucket)
 
     async def remove_own_reaction(self, channel_id: int, message_id: int, emoji: str) -> dict:
-        """Remove a reaction from a message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to remove a reaction from.
-        emoji : str
-            The emoji to remove.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
     async def remove_reaction(self, channel_id: int, message_id: int, emoji: str, member_id: int) -> dict:
-        """Remove a users reaction from a message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to remove a reaction from.
-        emoji : str
-            The emoji to remove.
-        member_id : int
-            The ID of the member thats reaction will be removed.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/{member_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
     async def get_reactions(self, channel_id: int, message_id: int, emoji: str, limit: int = 25, after: int = None) -> dict:
-        """_summary_
-            Get a list of users that reacted with this emoji.
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to get reactions from.
-        emoji : str
-            The emoji to get reactions for.
-        limit : int, optional
-            Max number of users to return (1-100), by default 25
-        after : int, optional
-            Get users after this user ID, by default None
-
-        Returns
-        -------
-        dict
-            List of user objects.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions/{emoji}'
         bucket = 'GET' + path
         params = {
@@ -369,68 +149,16 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def clear_reactions(self, channel_id: int, message_id: int) -> dict:
-        """Deletes all reactions on a message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to clear reactions from.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
     async def clear_single_reaction(self, channel_id: int, message_id: int, emoji: str) -> dict:
-        """Deletes all the reactions for a given emoji on a message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to clear reactions from.
-        emoji : str
-            The emoji to clear reactions for.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions/{emoji}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
     async def edit_message(self, channel_id: int, message_id: int, content: str = None, embeds: List[dict] = None, allowed_mentions: Any = None, components: List[Any] = None) -> dict:
-        """Edit a previously sent message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to edit.
-        content : str, optional
-            Message contents (up to 2000 characters), by default None
-        embeds : List[dict], optional
-            An array of dicts containing embed data, by default None
-        allowed_mentions : Any, optional
-            Allowed mentions for the message, by default None
-        components : List[Any], optional
-            An array of components to include with the message, by default None
-
-        Returns
-        -------
-        dict
-            _description_
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}'
         bucket = 'PATCH' + path
         payload = {}
@@ -447,43 +175,11 @@ class Paths:
         self._request('PATCH', path, bucket, json=payload)
 
     async def delete_message(self, channel_id: int, message_id: int, reason: str = None) -> dict:
-        """Delete a message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the message is in.
-        message_id : int
-            The ID of the message to delete.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/messages/{message_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def bulk_delete_messages(self, channel_id: int, message_ids: List[int], reason: str = None) -> dict:
-        """Delete multiple messages.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel the messages are in.
-        message_ids : List[int]
-            The IDs of the messages to delete.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """
         path = f'/channels/{channel_id}/messages/bulk-delete'
         bucket = 'POST' + path
         payload = {
@@ -492,79 +188,17 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def edit_channel_permissions(self, channel_id: int, overwrite_id: int, allow: str, deny: str, type: int, reason: str = None) -> dict:
-        """Edit the channel permission overwrites for a user or role in a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to edit permissions for.
-        overwrite_id : int
-            The ID of the user or role to edit permissions for.
-        allow : str
-            The bitwise value of all allowed permissions.
-        deny : str
-            The bitwise value of all disallowed permissions.
-        type : int
-            0 for a role or 1 for a member
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/permissions/{overwrite_id}'
         bucket = 'PUT' + path
         payload = {'allow': allow, 'deny': deny, 'type': type}
         return await self._request('PUT', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_channel_invites(self, channel_id: int) -> dict:
-        """Get a list of invites for a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get invites for.
-
-        Returns
-        -------
-        dict
-            A list of invite objects
-        """        
         path = f'/channels/{channel_id}/invites'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def create_channel_invite(self, channel_id: int, *, reason: str = None, max_age: int = 0, max_uses: int = 0, temporary: bool = False, unique: bool = True, target_type: int = None, target_user_id: int = None, target_application_id: int = None) -> dict:
-        """Create a new invite for a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to create an invite for.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-        max_age : int, optional
-            Duration of invite in seconds before expiry, by default 0
-        max_uses : int, optional
-            Max number of uses or 0 for unlimited, by default 0
-        temporary : bool, optional
-            Whether this invite only grants temporary membership, by default False
-        unique : bool, optional
-            If true, don't try to reuse a similar invite, by default True
-        target_type : int, optional
-            The type of target for this voice channel invite, by default None
-        target_user_id : int, optional
-            The id of the user whose stream to display for this invite, by default None
-        target_application_id : int, optional
-            The id of the embedded application to open for this invite, by default None
-
-        Returns
-        -------
-        dict
-            An invite object.
-        """        
         path = f'/channels/{channel_id}/invites'
         bucket = 'POST' + path
         payload = {
@@ -586,43 +220,11 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_channel_permissions(self, channel_id: int, overwrite_id: int, reason: str = None) -> dict:
-        """Delete a channel permission overwrite for a user or role in a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to delete permissions for.
-        overwrite_id : int
-            The ID of the user or role to delete permissions for.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/permissions/{overwrite_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def follow_news_channel(self, channel_id: int, webhook_channel_id: int, reason: str = None) -> dict:
-        """Follow a News Channel to send messages to a target channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to follow.
-        webhook_channel_id : int
-            ID of target channel.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/followers'
         bucket = 'POST' + path
         payload = {
@@ -631,150 +233,40 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def start_typing(self, channel_id: int) -> dict:
-        """Post a typing indicator for the specified channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to start the typing indicator in.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/typing'
         bucket = 'POST' + path
         return await self._request('POST', path, bucket)
 
     async def get_pinned_messages(self, channel_id: int) -> dict:
-        """Get a list of pinned messages in a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get pinned messages for.
-
-        Returns
-        -------
-        dict
-            List of message objects.
-        """        
         path = f'/channels/{channel_id}/pins'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def pin_message(self, channel_id: int, message_id: int, reason: str = None) -> dict:
-        """Pin a message in a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to pin the message in.
-        message_id : int
-            The ID of the message to pin.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/pins/{message_id}'
         bucket = 'PUT' + path
         return await self._request('PUT', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def unpin_message(self, channel_id: int, message_id: int, reason: str = None) -> dict:
-        """Unpin a message in a channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to unpin the message in.
-        message_id : int
-            The ID of the message to unpin.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/pins/{message_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
     
     async def add_group_recipient(self, channel_id: int, user_id: int, access_token: str, nickname: str = None) -> dict:
-        """Adds a recipient to a Group DM using their access token.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to add the recipient to.
-        user_id : int
-            The ID of the user to add as a recipient.
-        access_token : str
-            Access token of a user.
-        nickname : str, optional
-            Nickname of the user being added, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/recipients/{user_id}'
         bucket = 'PUT' + path
         payload = {
             'access_token': access_token,
             'nick': nickname
         }
-        return await self._request('PUT', path, bucket, json=payload)
+        return await self._request
 
     async def remove_group_recipient(self, channel_id: int, user_id: int) -> dict:
-        """Removes a recipient from a Group DM.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to remove the recipient from.
-        user_id : int
-            The ID of the user to remove as a recipient.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/recipients/{user_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
-    async def start_thread_from_message(self, channel_id: int, message_id: int, *, name: str, auto_archive_duration: int, rate_limit_per_user: int, reason: str = None) -> dict:
-        """Creates a new thread from an existing message.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to start the thread in.
-        message_id : int
-            The ID of the message to start the thread from.
-        name : str
-            1-100 character channel name.
-        auto_archive_duration : int
-            Duration in minutes to automatically archive the thread after recent activity.
-        rate_limit_per_user : int
-            Amount of seconds a user has to wait before sending another message.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            A channel object.
-        """        
+    async def start_thread_with_message(self, channel_id: int, message_id: int, *, name: str, auto_archive_duration: int, rate_limit_per_user: int, reason: str = None) -> dict:
         path = f'/channels/{channel_id}/messages/{message_id}/threads'
         bucket = 'POST' + path
         payload = {
@@ -786,30 +278,6 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def start_thread_without_message(self, channel_id: int, name: str, auto_archive_duration: int, type: int, invitable: bool = True, rate_limit_per_user: int = None, reason: str = None) -> dict:
-        """Creates a new thread.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to start the thread in.
-        name : str
-            1-100 character channel name.
-        auto_archive_duration : int
-            Duration in minutes to automatically archive the thread after recent activity.
-        type : int
-            The type of thread to create.
-        invitable : bool, optional
-            Whether non-moderators can add other non-moderators to a thread, by default True
-        rate_limit_per_user : int, optional
-            Amount of seconds a user has to wait before sending another message, by default None
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            A channel object.
-        """        
         path = f'/channels/{channel_id}/threads'
         bucket = 'POST' + path
         payload = {
@@ -823,33 +291,6 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def start_thread_in_forum(self, channel_id: int, name: str, auto_archive_duration: int, rate_limit_per_user: int = None, reason: str = None, **message: Any) -> dict:
-        """Creates a new thread in a forum channel.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to start the thread in.
-        name : str
-            1-100 character channel name.
-        auto_archive_duration : int
-            Duration in minutes to automatically archive the thread after recent activity.
-        rate_limit_per_user : int, optional
-            Amount of seconds a user has to wait before sending another message (0-21600), by default None
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-        message : Any
-            Params for a message to send in the thread.
-
-        Returns
-        -------
-        dict
-            A channel object, with a nested message object.
-
-        Raises
-        ------
-        InvalidParams
-            Invalid params were given.
-        """        
         path = f'/channels/{channel_id}/threads'
         bucket = 'POST' + path
         if message.get('content') is None and message.get('embeds') is None and message.get('sticker_ids') is None:
@@ -874,130 +315,36 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def join_thread(self, channel_id: int) -> dict:
-        """Adds the current user to a thread.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the thread to join.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/thread-members/@me'
         bucket = 'PUT' + path
         return await self._request('PUT', path, bucket)
 
     async def add_user_to_thread(self, channel_id: int, user_id: int) -> dict:
-        """Adds another member to a thread.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the thread to add a user to.
-        user_id : int
-            The ID of the user to add to the thread.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/thread-members/{user_id}'
         bucket = 'PUT' + path
         return await self._request('PUT', path, bucket)
 
     async def leave_thread(self, channel_id: int) -> dict:
-        """Removes the current user from a thread.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the thread to leave.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/thread-members/@me'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
     async def remove_user_from_thread(self, channel_id: int, user_id: int) -> dict:
-        """Removes a member from a thread.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the thread to remove a user from.
-        user_id : int
-            The ID of the user to remove from the thread.
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/channels/{channel_id}/thread-members/{user_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
     
     async def get_thread_member(self, channel_id: int, user_id: int) -> dict:
-        """Gets a thread member.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the thread to get a member from.
-        user_id : int
-            The ID of the user to get from the thread.
-
-        Returns
-        -------
-        dict
-            A thread member object.
-        """        
         path = f'/channels/{channel_id}/thread-members/{user_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_thread_members(self, channel_id: int) -> dict:
-        """Gets all thread members.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the thread to get members from.
-
-        Returns
-        -------
-        dict
-            List of thread member objects.
-        """        
         path = f'/channels/{channel_id}/thread-members'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
-    async def get_public_archived_threads(self, channel_id: int, before: ISO8601_timestamp = None, limit: int = 50) -> dict:
-        """Returns archived threads in the channel that are public.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get archived threads from.
-        before : ISO8601_timestamp, optional
-            Returns threads before this timestamp, by default None
-        limit : int, optional
-            Optional maximum number of threads to return, by default 50
-
-        Returns
-        -------
-        dict
-            List of archived threads in the channel that are public.
-        """        
+    async def get_public_archived_threads(self, channel_id: int, before: int = None, limit: int = 50) -> dict:
         path = f'/channels/{channel_id}/threads/archived/public'
         bucket = 'GET' + path
 
@@ -1008,22 +355,6 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def get_private_archived_threads(self, channel_id: int, before: ISO8601_timestamp = None, limit = 50) -> dict:
-        """Returns archived threads in the channel that are private.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get archived threads from.
-        before : ISO8601_timestamp, optional
-            Returns threads before this timestamp, by default None
-        limit : int, optional
-            Optional maximum number of threads to return, by default 50
-
-        Returns
-        -------
-        dict
-            List of archived threads in the channel that are private.
-        """        
         path = f'/channels/{channel_id}/threads/archived/private'
         bucket = 'GET' + path
 
@@ -1034,22 +365,6 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def get_joined_private_archived_threads(self, channel_id: int, before: int = None, limit: int = 50) -> dict:
-        """Returns archived joined threads in the channel that are private.
-
-        Parameters
-        ----------
-        channel_id : int
-            The ID of the channel to get joined archived threads from.
-        before : int, optional
-            Returns threads before this id, by default None
-        limit : int, optional
-            Optional maximum number of threads to return, by default 50
-
-        Returns
-        -------
-        dict
-            List of archived joined threads in the channel that are private.
-        """        
         path = f'/channels/{channel_id}/users/@me/threads/archived/private'
         bucket = 'GET' + path
         params = {}
@@ -1063,37 +378,11 @@ class Paths:
     """
 
     async def get_guild_emojis(self, guild_id: int) -> dict:
-        """Gets all emojis in a guild.
-
-        Parameters
-        ----------
-        guild_id : int
-            The ID of the guild to get emojis from.
-
-        Returns
-        -------
-        dict
-            List of emoji objects.
-        """        
         path = f'/guilds/{guild_id}/emojis'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_guild_emoji(self, guild_id: int, emoji_id: int) -> dict:
-        """Gets an emoji in a guild.
-
-        Parameters
-        ----------
-        guild_id : int
-            The ID of the guild to get an emoji from.
-        emoji_id : int
-            The ID of the emoji to get.
-
-        Returns
-        -------
-        dict
-            An emoji object.
-        """        
         path = f'/guilds/{guild_id}/emojis/{emoji_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
@@ -1111,26 +400,6 @@ class Paths:
     """
 
     async def edit_custom_emoji(self, guild_id: int, emoji_id: int, name: str = None, roles: List[int] = None, reason: str = None) -> dict:
-        """Edits a custom emoji.
-
-        Parameters
-        ----------
-        guild_id : int
-            The ID of the guild to edit an emoji from.
-        emoji_id : int
-            The ID of the emoji to edit.
-        name : str, optional
-            Name of the emoji, by default None
-        roles : List[int], optional
-            List of roles allowed to use this emoji, by default None
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            An emoji object.
-        """        
         path = f'/guilds/{guild_id}/emojis/{emoji_id}'
         bucket = 'PATCH' + path
         payload = {}
@@ -1141,22 +410,6 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_custom_emoji(self, guild_id: int, emoji_id: int, reason: str = None) -> dict:
-        """Deletes a custom emoji.
-
-        Parameters
-        ----------
-        guild_id : int
-            The ID of the guild to delete an emoji from.
-        emoji_id : int
-            The ID of the emoji to delete.
-        reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
-
-        Returns
-        -------
-        dict
-            The response from Discord.
-        """        
         path = f'/guilds/{guild_id}/emojis/{emoji_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})

@@ -1,1 +1,1 @@
-from discord_limits.api import DiscordClient
+from .api import DiscordClient

@@ -109,8 +109,16 @@ class DiscordClient(Paths):
             else:
                 text = f"{message}"
             raise TooManyRequests(text + f', bucket: {bucket}')
+        elif status == 400:
+            raise BadRequest(f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}')
+        elif status == 401:
+            raise Unauthorized(f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}')
+        elif status == 403:
+            raise Forbidden(f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}')
         elif status == 404:
             raise NotFound(f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}')
+        elif status == 500:
+            raise InternalServerError(f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}')
         else:
             error_text = f'Error code: "{status}" Reason: "{reason}"'
             if status in api_errors:

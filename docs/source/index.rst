@@ -8,6 +8,9 @@ Guide
    :maxdepth: 2
    :caption: Contents:
 
+   api
+   extras
+
 
 
 Indices and tables
@@ -18,8 +21,8 @@ Indices and tables
 * :ref:`search`
 
 
-Currently this library has only been tested on 3.9
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Currently this library has only been tested on Python 3.9
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 --------------
 
@@ -41,13 +44,13 @@ Basic usage
 Requires:
 ~~~~~~~~~
 
--  `aiolimiter <https://pypi.org/project/aiolimiter/>`__
--  `aiohttp <https://pypi.org/project/aiohttp/>`__
+*  `aiolimiter <https://pypi.org/project/aiolimiter/>`__
+*  `aiohttp <https://pypi.org/project/aiohttp/>`__
 
 --------------
 
 Based off of:
 ~~~~~~~~~~~~~
 
--  `unbelipy <https://github.com/chrisdewa/unbelipy>`__
--  `discord.py <https://github.com/Rapptz/discord.py>`__
+*  `unbelipy <https://github.com/chrisdewa/unbelipy>`__
+*  `discord.py <https://github.com/Rapptz/discord.py>`__

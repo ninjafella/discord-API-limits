@@ -1,0 +1,1 @@
+from .applicationCommandPaths import ApplicationCommandPaths

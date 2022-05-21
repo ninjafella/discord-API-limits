@@ -5,7 +5,7 @@ class ApplicationCommandPaths:
 
     def __init__(self, client: discord_limits.DiscordClient):
         if not isinstance(client, discord_limits.DiscordClient):
-            raise TypeError('client must be an instance of discord_limits.DiscordClient')
+            raise TypeError('"client" must be an instance of discord_limits.DiscordClient')
         self._client = client
 
     # Application commands (global)

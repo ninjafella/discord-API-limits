@@ -5,3 +5,4 @@ create_guild_sticker()
 edit_webhook()
 https://discord.com/developers/docs/resources/guild#get-guild-widget-image
 start_thread_in_forum()
+create_from_template()
