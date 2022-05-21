@@ -3,8 +3,8 @@ Extras
 
 .. currentmodule:: discord_limits.extras
 
-DiscordClient
--------------
+ApplicationCommandPaths
+-----------------------
 .. autoclass:: ApplicationCommandPaths()
     :members:
     :inherited-members:
