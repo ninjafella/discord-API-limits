@@ -101,7 +101,7 @@ class DiscordClient(Paths):
             message = data['message']
             if 'global' in data:
                 text = f"Global rate limit. {data['message']}"
-            elif retry_after := data.get('retry_after'):
+            elif retry_after == data.get('retry_after'):
                 retry_after = int(retry_after) / 1000
                 bucket_handler = self._get_bucket_handler(bucket)
                 bucket_handler.retry_after = retry_after

@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/discord-limits/badge/?version=latest)](https://discord-limits.readthedocs.io/en/latest/?badge=latest)
+
 # discord_limits
 
 ### A simple library to asynchronously make API requests to Discord without having to worry about ratelimits.
