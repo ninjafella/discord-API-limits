@@ -123,7 +123,7 @@ class Paths:
         channel_id : int
             The ID of the channel to be deleted/closed.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -456,7 +456,7 @@ class Paths:
         message_id : int
             The ID of the message to delete.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -477,7 +477,7 @@ class Paths:
         message_ids : List[int]
             The IDs of the messages to delete.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -507,7 +507,7 @@ class Paths:
         type : int
             0 for a role or 1 for a member
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -544,7 +544,7 @@ class Paths:
         channel_id : int
             The ID of the channel to create an invite for.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
         max_age : int, optional
             Duration of invite in seconds before expiry, by default 0
         max_uses : int, optional
@@ -595,7 +595,7 @@ class Paths:
         overwrite_id : int
             The ID of the user or role to delete permissions for.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -616,7 +616,7 @@ class Paths:
         webhook_channel_id : int
             ID of target channel.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -674,7 +674,7 @@ class Paths:
         message_id : int
             The ID of the message to pin.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -695,7 +695,7 @@ class Paths:
         message_id : int
             The ID of the message to unpin.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -768,7 +768,7 @@ class Paths:
         rate_limit_per_user : int
             Amount of seconds a user has to wait before sending another message.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -803,7 +803,7 @@ class Paths:
         rate_limit_per_user : int, optional
             Amount of seconds a user has to wait before sending another message, by default None
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -836,7 +836,7 @@ class Paths:
         rate_limit_per_user : int, optional
             Amount of seconds a user has to wait before sending another message (0-21600), by default None
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
         message : Any
             Params for a message to send in the thread.
 
@@ -1124,7 +1124,7 @@ class Paths:
         roles : List[int], optional
             List of roles allowed to use this emoji, by default None
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -1150,7 +1150,7 @@ class Paths:
         emoji_id : int
             The ID of the emoji to delete.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
 
         Returns
         -------
@@ -1267,7 +1267,7 @@ class Paths:
         guild_id : int
             The ID of the guild to edit.
         reason : str, optional
-            A reason for this edit that will be displayed in the audit log, by default None
+            A reason for this action that will be displayed in the audit log, by default None
         options : Any
             The params required to update the required aspects of the guild.
 
@@ -1321,12 +1321,41 @@ class Paths:
         return await self._request('DELETE', path, bucket)
 
     async def get_guild_channels(self, guild_id: int) -> dict:
+        """Get a guild's channels.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get channels for.
+
+        Returns
+        -------
+        dict
+            A list of guild channel objects.
+        """        
         path = f'/guilds/{guild_id}/channels'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def create_channel(self, guild_id: int, name: str, *, reason: str = None, **options: Any) -> dict:
+        """Create a channel in a guild.
 
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to create a channel in.
+        name : str
+            The channel name (1-100 characters).
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+        options : Any
+            The params required to create a channel of the required settings.
+
+        Returns
+        -------
+        dict
+            A channel object.
+        """        
         path = f'/guilds/{guild_id}/channels'
         bucket = 'POST' + path
 
@@ -1351,6 +1380,28 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def edit_channel_position(self, guild_id: int, channel_id: int, position: int, sync_permissions: bool, parent_id: int, reason: str = None) -> dict:
+        """Edit a channel's position in the channel list.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit the channel position in.
+        channel_id : int
+            The ID of the channel to edit.
+        position : int
+            The new position of the channel.
+        sync_permissions : bool
+            Whether to sync permissions with the channel's new position.
+        parent_id : int
+            The ID of the new parent category for the channel.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/channels'
         bucket = 'PATCH' + path
 
@@ -1364,16 +1415,63 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_active_threads(self, guild_id: int) -> dict:
+        """Get a guild's active threads.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get active threads for.
+
+        Returns
+        -------
+        dict
+            A list of threads and members.
+        """
         path = f'/guilds/{guild_id}/threads/active'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_member(self, guild_id: int, member_id: int) -> dict:
+        """Get a member in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get a member from.
+        member_id : int
+            The ID of the member to get.
+
+        Returns
+        -------
+        dict
+            A guild member object.
+        """        
         path = f'/guilds/{guild_id}/members/{member_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_members(self, guild_id: int, limit: int = 1, after: int = None) -> dict:
+        """Get a list of members in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get members from.
+        limit : int, optional
+            Max number of members to return (1-1000), by default 1
+        after : int, optional
+            The highest user id in the previous page, by default None
+
+        Returns
+        -------
+        dict
+            List of guild member objects.
+
+        Raises
+        ------
+        InvalidParams
+            If the limit is not between 1 and 1000.
+        """        
         if 1 > limit or limit > 1000:
             raise InvalidParams('limit must be between 1 and 1000')
 
@@ -1389,6 +1487,27 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def search_guild_members(self, guild_id: int, query: str, limit: int = 1) -> dict:
+        """Search for members in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to search for members in.
+        query : str
+            The query to search for.
+        limit : int, optional
+            Max number of members to return (1-1000), by default 1
+
+        Returns
+        -------
+        dict
+            List of guild member objects.
+
+        Raises
+        ------
+        InvalidParams
+            If the limit is not between 1 and 1000.
+        """        
         if 1 > limit or limit > 1000:
             raise InvalidParams('limit must be between 1 and 1000')
 
@@ -1402,6 +1521,30 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def add_guild_member(self, guild_id: int, user_id: int, access_token: str, nick: str = None, roles: List[int] = None, mute: bool = False, deaf: bool = False) -> dict:
+        """Add a member to a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to add a member to.
+        user_id : int
+            The ID of the user to add.
+        access_token : str
+            The access token of the user to add.
+        nick : str, optional
+            Value to set user's nickname to, by default None
+        roles : List[int], optional
+            Array of role ids the member is assigned, by default None
+        mute : bool, optional
+            Whether the user is muted in voice channels, by default False
+        deaf : bool, optional
+            Whether the user is deafened in voice channels, by default False
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/members/{user_id}'
         bucket = 'PUT' + path
 
@@ -1419,6 +1562,34 @@ class Paths:
         return await self._request('PUT', path, bucket, json=payload)
 
     async def modify_guild_member(self, user_id: int, guild_id: int, nick: str = None, roles: List[int] = None, mute: bool = None, deafen: bool = None, channel_id: int = None, timeout: ISO8601_timestamp = None, reason: str = None) -> dict:
+        """Modify a member in a guild.
+
+        Parameters
+        ----------
+        user_id : int
+            The ID of the user to modify.
+        guild_id : int
+            The ID of the guild to modify the member in.
+        nick : str, optional
+            Value to set user's nickname to, by default None
+        roles : List[int], optional
+            Array of role ids the member is assigned, by default None
+        mute : bool, optional
+            Whether the user is muted in voice channels, by default None
+        deafen : bool, optional
+            Whether the user is deafened in voice channels, by default None
+        channel_id : int, optional
+            ID of channel to move user to, by default None
+        timeout : ISO8601_timestamp, optional
+            When the user's timeout will expire and the user will be able to communicate in the guild again, by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/members/{user_id}'
         bucket = 'PATCH' + path
         payload = {}
@@ -1438,6 +1609,22 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def modify_current_member(self, guild_id: int, nick: str, reason: str = None) -> dict:
+        """Modify the current user in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to modify the member in.
+        nick : str
+            Value to set user's nickname to.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/members/@me'
         bucket = 'PATCH' + path
         payload = {
@@ -1446,21 +1633,91 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def add_role(self, guild_id: int, user_id: int, role_id: int, reason: str = None) -> dict:
+        """Add a role to a member in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild that the users is in.
+        user_id : int
+            The ID of the user to add a role to.
+        role_id : int
+            The ID of the role to add.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/members/{user_id}/roles/{role_id}'
         bucket = 'PUT' + path
         return await self._request('PUT', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
-    async def remove_role(self, guild_id: int, user_id: int, role_id: int, *, reason: str = None) -> dict:
+    async def remove_role(self, guild_id: int, user_id: int, role_id: int, reason: str = None) -> dict:
+        """Remove a role from a member in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild that the users is in.
+        user_id : int
+            The ID of the user to remove a role from.
+        role_id : int
+            The ID of the role to remove.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/members/{user_id}/roles/{role_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def kick(self, user_id: int, guild_id: int, reason: str = None) -> dict:
+        """Kick a member from a guild.
+
+        Parameters
+        ----------
+        user_id : int
+            The ID of the user to kick.
+        guild_id : int
+            The ID of the guild to kick the member from.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/members/{user_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
-    async def get_bans(self, guild_id: int, limit: int, before: int = None, after: int = None) -> dict:
+    async def get_bans(self, guild_id: int, limit: int = 1000, before: int = None, after: int = None) -> dict:
+        """Get a list of all bans in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get bans from.
+        limit : int, optional
+            The number of users to return (up to maximum 1000), by default 1000
+        before : int, optional
+            Consider only users before given user id, by default None
+        after : int, optional
+            Consider only users after given user id, by default None
+
+        Returns
+        -------
+        dict
+            A list of ban objects.
+        """
         path = f'/guilds/{guild_id}/bans'
         bucket = 'GET' + path
         params = {
@@ -1474,11 +1731,48 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def get_ban(self, user_id: int, guild_id: int) -> dict:
+        """Get a ban from a guild.
+
+        Parameters
+        ----------
+        user_id : int
+            The ID of the user to get a ban from.
+        guild_id : int
+            The ID of the guild to get a ban from.
+
+        Returns
+        -------
+        dict
+            A ban object.
+        """        
         path = f'/guilds/{guild_id}/bans/{user_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def ban(self, user_id: int, guild_id: int, delete_message_days: int = 0, reason: str = None) -> dict:
+        """Ban a user from a guild.
+
+        Parameters
+        ----------
+        user_id : int
+            The ID of the user to ban.
+        guild_id : int
+            The ID of the guild to ban the user from.
+        delete_message_days : int, optional
+            Number of days to delete messages for (0-7), by default 0
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A ban object.
+
+        Raises
+        ------
+        InvalidParams
+            If the delete_message_days is not an integer between 0 and 7.
+        """        
         if 0 > delete_message_days or delete_message_days > 7:
             raise InvalidParams('limit must be between 0 and 7')
         
