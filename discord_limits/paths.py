@@ -1165,7 +1165,37 @@ class Paths:
     Guild
     """
 
-    async def create_guild(self, name: str, verification_level: int = None, default_message_notifications: int = None, explicit_content_filter: int = None, roles: List[int] = None, channels: Any = None, afk_channel_id: int = None, afk_timeout:int = None, system_channel_id: int = None, system_channel_flags: int = None) -> dict:
+    async def create_guild(self, name: str, verification_level: int = None, default_message_notifications: int = None, explicit_content_filter: int = None, roles: List[Any] = None, channels: List[Any] = None, afk_channel_id: int = None, afk_timeout:int = None, system_channel_id: int = None, system_channel_flags: int = None) -> dict:
+        """Create a new guild.
+
+        Parameters
+        ----------
+        name : str
+            Name of the guild (2-100 characters).
+        verification_level : int, optional
+            The verification level for the guild, by default None
+        default_message_notifications : int, optional
+            The default message notification level, by default None
+        explicit_content_filter : int, optional
+            The explicit content filter level, by default None
+        roles : List[Any], optional
+            The roles for the guild, by default None
+        channels : List[Any], optional
+            The channels for the guild, by default None
+        afk_channel_id : int, optional
+            The ID for afk channel, by default None
+        afk_timeout : int, optional
+            The AFK timeout in seconds, by default None
+        system_channel_id : int, optional
+            The id of the channel where guild notices are sent, by default None
+        system_channel_flags : int, optional
+            System channel flags, by default None
+
+        Returns
+        -------
+        dict
+            A guild object.
+        """        
         path = '/guilds'
         bucket = 'POST' + path
         payload = {
@@ -1193,17 +1223,59 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload)
 
     async def get_guild(self, guild_id: int, with_counts: bool = True) -> dict:
+        """Get a guild by ID.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get.
+        with_counts : bool, optional
+            When true, will return approximate member and presence counts for the guild, by default True
+
+        Returns
+        -------
+        dict
+            A guild object.
+        """        
         path = f'/guilds/{guild_id}'
         bucket = 'GET' + path
         params = {'with_counts': with_counts}
         return await self._request('GET', path, bucket, params=params)
 
     async def get_guild_preview(self, guild_id: int) -> dict:
+        """Get a guild preview by ID.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get.
+
+        Returns
+        -------
+        dict
+            A guild preview object.
+        """        
         path = f'/guilds/{guild_id}/preview'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def edit_guild(self, guild_id: int, reason: str = None, **options: Any) -> dict:
+        """Edit a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit.
+        reason : str, optional
+            A reason for this edit that will be displayed in the audit log, by default None
+        options : Any
+            The params required to update the required aspects of the guild.
+
+        Returns
+        -------
+        dict
+            A guild object.
+        """        
         path = f'/guilds/{guild_id}'
         bucket = 'PATCH' + path
 
@@ -1232,6 +1304,18 @@ class Paths:
         self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_guild(self, guild_id: int) -> dict:
+        """Delete a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to delete.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
