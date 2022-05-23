@@ -39,9 +39,11 @@ class BucketHandler:
         for key in header_attrs:
             value = r.headers.get(key)
             if value is not None:
-                value = int(value)
+                print(value)
+                value = int(float(value))
+                print(value)
                 if key == 'X-RateLimit-Reset':
-                    value = datetime.utcfromtimestamp(value / 1000)
+                    value = datetime.utcfromtimestamp(value)
             limits[header_attrs[key]] = value
         for k, v in limits.items():
             setattr(self, k, v)

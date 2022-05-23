@@ -5,6 +5,6 @@ Extras
 
 ApplicationCommandPaths
 -----------------------
-.. autoclass:: ApplicationCommandPaths()
+.. autoclass:: ApplicationCommandPaths
     :members:
     :inherited-members:

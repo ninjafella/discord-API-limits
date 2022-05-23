@@ -2,8 +2,19 @@ from discord_limits.errors import *
 import discord_limits
 
 class ApplicationCommandPaths:
+    """
+    Parameters
+    ----------
+    client : discord_limits.DiscordClient
+        The DiscordClient instance to use.
 
-    def __init__(self, client: discord_limits.DiscordClient):
+    Raises
+    ------
+    TypeError
+        'client' must be of type `discord_limits.DiscordClient`.
+    """   
+
+    def __init__(self, client: discord_limits.DiscordClient):     
         if not isinstance(client, discord_limits.DiscordClient):
             raise TypeError('"client" must be an instance of discord_limits.DiscordClient')
         self._client = client

@@ -1,26 +1,42 @@
 import asyncio
-from inspect import stack
 from aiohttp import ClientSession, ClientResponse
 import warnings
 
-from discord_limits.errors import *
-from discord_limits.rate_limits import BucketHandler, ClientRateLimits
-from discord_limits.paths import Paths
+from .errors import *
+from .rate_limits import BucketHandler, ClientRateLimits
+from .paths import Paths
 
 class DiscordClient(Paths):
+    """
+    Parameters
+    ----------
+    token : str
+        The token to use for the request.
+    token_type : str, optional
+        The type of token provided, by default 'bot'
+    prevent_rate_limits : bool, optional
+        Whether the client will sleep through ratelimits to prevent 429 errors, by default True
+    retry_rate_limits : bool, optional
+        Whether the client will sleep and retry after 429 errors, by default True
+    api_version : int, optional
+        The Discord API version to use, by default 9
+    """  
     
-    def __init__(self, token: str, prevent_rate_limits: bool = True, retry_rate_limits: bool = False, api_version: int = 9, token_type: str = 'bot'):
+    def __init__(self, token: str, token_type: str = 'bot', prevent_rate_limits: bool = True, retry_rate_limits: bool = True, api_version: int = 9):      
+        super().__init__(self)
         if token_type == 'bot':
             self.token = f"Bot {token}"
+            self.token_type = token_type
         elif token_type == 'bearer':
             self.token = f"Bearer {token}"
+            self.token_type = token_type
         elif token_type == 'user':
             warnings.warn("Use a user token at your own risk as (depending on your usage) it could be against Discord's ToS. If you are using this token for a bot, you should use the 'bot' token_type instead.", UserWarning)
             self.token = f"{token}"
+            self.token_type = token_type
         else:
             self.token = None
-
-        self.token_type = token_type
+            self.token_type = None
 
         self._prevent_rate_limits = prevent_rate_limits
         self._retry_rate_limits = retry_rate_limits
@@ -38,12 +54,6 @@ class DiscordClient(Paths):
             self.token = f"{token}"
         else:
             self.token = None
-
-    def _get_member_url(self, guild_id: int, member_id: int):
-        self._member_url = self._base_url + '/guilds/{guild_id}/users/{member_id}'
-        url = self._member_url.format(guild_id=guild_id, member_id=member_id)
-        route = url[self._base_url_len:-len(str(member_id))] + ':id'
-        return url, route
 
     def _get_bucket_handler(self, bucket: str):
         bucket_handler = self.rate_limits.buckets.get(bucket)

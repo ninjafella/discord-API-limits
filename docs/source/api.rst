@@ -5,6 +5,6 @@ API
 
 DiscordClient
 -------------
-.. autoclass:: DiscordClient()
+.. autoclass:: DiscordClient
     :members:
     :inherited-members:
