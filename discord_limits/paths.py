@@ -1,6 +1,5 @@
 from .errors import *
 from typing import Optional, Any, List, TypeVar, Dict
-from .embed import Embed
 
 ISO8601_timestamp = TypeVar('ISO8601_timestamp')
 
@@ -31,7 +30,7 @@ class Paths:
         Returns
         -------
         dict
-            List of audit logs.
+            A list of audit logs.
         
         Raises
         ------
@@ -153,7 +152,7 @@ class Paths:
         Returns
         -------
         dict
-            List of message objects.
+            A list of message objects.
 
         Raises
         ------
@@ -356,7 +355,7 @@ class Paths:
         Returns
         -------
         dict
-            List of user objects.
+            A list of user objects.
         """        
         path = f'/channels/{channel_id}/messages/{message_id}/reactions/{emoji}'
         bucket = 'GET' + path
@@ -658,7 +657,7 @@ class Paths:
         Returns
         -------
         dict
-            List of message objects.
+            A list of message objects.
         """        
         path = f'/channels/{channel_id}/pins'
         bucket = 'GET' + path
@@ -975,7 +974,7 @@ class Paths:
         Returns
         -------
         dict
-            List of thread member objects.
+            A list of thread member objects.
         """        
         path = f'/channels/{channel_id}/thread-members'
         bucket = 'GET' + path
@@ -996,7 +995,7 @@ class Paths:
         Returns
         -------
         dict
-            List of archived threads in the channel that are public.
+            A list of archived threads in the channel that are public.
         """        
         path = f'/channels/{channel_id}/threads/archived/public'
         bucket = 'GET' + path
@@ -1022,7 +1021,7 @@ class Paths:
         Returns
         -------
         dict
-            List of archived threads in the channel that are private.
+            A list of archived threads in the channel that are private.
         """        
         path = f'/channels/{channel_id}/threads/archived/private'
         bucket = 'GET' + path
@@ -1048,7 +1047,7 @@ class Paths:
         Returns
         -------
         dict
-            List of archived joined threads in the channel that are private.
+            A list of archived joined threads in the channel that are private.
         """        
         path = f'/channels/{channel_id}/users/@me/threads/archived/private'
         bucket = 'GET' + path
@@ -1073,7 +1072,7 @@ class Paths:
         Returns
         -------
         dict
-            List of emoji objects.
+            A list of emoji objects.
         """        
         path = f'/guilds/{guild_id}/emojis'
         bucket = 'GET' + path
@@ -1122,7 +1121,7 @@ class Paths:
         name : str, optional
             Name of the emoji, by default None
         roles : List[int], optional
-            List of roles allowed to use this emoji, by default None
+            A Llst of roles allowed to use this emoji, by default None
         reason : str, optional
             A reason for this action that will be displayed in the audit log, by default None
 
@@ -1465,7 +1464,7 @@ class Paths:
         Returns
         -------
         dict
-            List of guild member objects.
+            A list of guild member objects.
 
         Raises
         ------
@@ -1501,7 +1500,7 @@ class Paths:
         Returns
         -------
         dict
-            List of guild member objects.
+            A list of guild member objects.
 
         Raises
         ------
@@ -1786,16 +1785,70 @@ class Paths:
         return await self._request('PUT', path, bucket, params=params, headers={'X-Audit-Log-Reason': reason})
 
     async def unban(self, user_id: int, guild_id: int, *, reason: str = None) -> dict:
+        """Unban a user from a guild.
+
+        Parameters
+        ----------
+        user_id : int
+            The ID of the user to unban.
+        guild_id : int
+            The ID of the guild to unban the user from.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/bans/{user_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def get_roles(self, guild_id: int) -> dict:
+        """Get a list of all roles in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get roles from.
+
+        Returns
+        -------
+        dict
+            A list of role objects.
+        """        
         path = f'/guilds/{guild_id}/roles'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def create_role(self, guild_id: int, name: str = None, permissions: str = None, colour: int = None, hoist: bool = None, unicode_emoji: str = None, mentionable: bool = None, reason: str = None) -> dict:
+        """Create a role in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to create a role in.
+        name : str, optional
+            Name of the role, by default None
+        permissions : str, optional
+            Bitwise value of the enabled permissions, by default None
+        colour : int, optional
+            RGB colour value, by default None
+        hoist : bool, optional
+            Whether the role should be displayed separately in the sidebar, by default None
+        unicode_emoji : str, optional
+            The role's unicode emoji as a standard emoji, by default None
+        mentionable : bool, optional
+            Whether the role should be mentionable, by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A role object.
+        """        
         path = f'/guilds/{guild_id}/roles'
         bucket = 'POST' + path
         payload = {}
@@ -1814,6 +1867,24 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def move_role_position(self, guild_id: int, role_id: int, position: int, reason: str = None) -> dict:
+        """Move a role's position in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to move a role in.
+        role_id : int
+            The ID of the role to move.
+        position : int
+            The new position of the role.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A list of role objects.
+        """        
         path = f'/guilds/{guild_id}/roles'
         bucket = 'PATCH' + path
         payload = {
@@ -1823,6 +1894,22 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def edit_role(self, guild_id: int, role_id: int, reason: str = None, **fields: Any) -> dict:
+        """Edit a role in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit a role in.
+        role_id : int
+            The ID of the role to edit.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A role object.
+        """        
         path = f'/guilds/{guild_id}/roles/{role_id}'
         bucket = 'PATCH' + path
         valid_keys = ('name', 'permissions', 'color', 'hoist', 'unicode_emoji', 'mentionable')
@@ -1830,11 +1917,48 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_role(self, guild_id: int, role_id: int, reason: str = None) -> dict:
+        """Delete a role from a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to delete a role from.
+        role_id : int
+            The ID of the role to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/roles/{role_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def estimate_pruned_members(self, guild_id: int, days: int = 7, roles: str = None) -> dict:
+        """Get the number of members that would be removed from a guild if prune was run.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get prune estimates for.
+        days : int, optional
+            Number of days to count prune for (1-30), by default 7
+        roles : str, optional
+            Role(s) to include, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+
+        Raises
+        ------
+        InvalidParams
+            If the days parameter is not between 1 and 30.
+        """        
         if 1 > days or days > 30:
             raise InvalidParams('days must be between 1 and 30')
 
@@ -1850,6 +1974,31 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def prune_members(self, guild_id: int, days: int = 7, compute_prune_count: bool = False, roles: List[int] = None, reason: str = None) -> dict:
+        """Prune members from a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to prune members from.
+        days : int, optional
+            Number of days to prune (1-30), by default 7
+        compute_prune_count : bool, optional
+            Whether pruned is returned, by default False
+        roles : List[int], optional
+            Role(s) to include, by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+
+        Raises
+        ------
+        InvalidParams
+            If the days parameter is not between 1 and 30.
+        """        
         if 1 > days or days > 30:
             raise InvalidParams('days must be between 1 and 30')
 
@@ -1866,21 +2015,73 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_voice_regions(self, guild_id: int) -> dict:
+        """Get the voice regions for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get voice regions for.
+
+        Returns
+        -------
+        dict
+            A list of voice region objects.
+        """        
         path = f'/guilds/{guild_id}/regions'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_guild_invites(self, guild_id: int) -> dict:
+        """Get the invites for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get invites for.
+
+        Returns
+        -------
+        dict
+            A list of invite objects.
+        """        
         path = f'/guilds/{guild_id}/invites'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_guild_integrations(self, guild_id: int) -> dict:
+        """Get the integrations for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get integrations for.
+
+        Returns
+        -------
+        dict
+            A list of integration objects.
+        """        
         path = f'/guilds/{guild_id}/integrations'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
-    async def create_integration(self, guild_id: int, type, id) -> dict:
+    async def create_integration(self, guild_id: int, type: Any, id: Any) -> dict:
+        """Create an integration for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to create an integration for.
+        type : Any
+            The type of integration to create.
+        id : Any
+            The ID of the integration to create.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/integrations'
         bucket = 'POST' + path
 
@@ -1891,30 +2092,106 @@ class Paths:
 
         return await self._request('POST', path, bucket, json=payload)
 
-    async def edit_integration(self, guild_id: int, integration_id: int, **payload) -> dict:
+    async def edit_integration(self, guild_id: int, integration_id: int, **payload : Any) -> dict:
+        """Edit an integration for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit an integration for.
+        integration_id : int
+            The ID of the integration to edit.
+        payload : Any
+            The params for the JSON payload.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/integrations/{integration_id}'
         bucket = 'PATCH' + path
 
         return await self._request('PATCH', path, bucket, json=payload)
 
     async def sync_integration(self, guild_id: int, integration_id: int) -> dict:
+        """Sync an integration for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to sync an integration for.
+        integration_id : int
+            The ID of the integration to sync.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/integrations/{integration_id}/sync'
         bucket = 'POST' + path
 
         return await self._request('POST', path, bucket)
 
     async def delete_guild_integration(self, guild_id: int, integration_id: int, *, reason: str = None) -> dict:
+        """Delete an integration for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to delete an integration for.
+        integration_id : int
+            The ID of the integration to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/integrations/{integration_id}'
         bucket = 'DELETE' + path
 
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def get_guild_widget_settings(self, guild_id: int) -> dict:
+        """Get the widget settings for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get widget settings for.
+
+        Returns
+        -------
+        dict
+            A guild widget settings object.
+        """        
         path = f'/guilds/{guild_id}/widget'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def edit_widget(self, guild_id: int, enabled, channel_id: int, reason: str = None) -> dict:
+        """Edit the widget settings for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit widget settings for.
+        enabled : _type_
+            Whether the widget is enabled.
+        channel_id : int
+            The ID of the channel to send the widget to.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A guild widget settings object.
+        """        
         path = f'/guilds/{guild_id}/widget'
         bucket = 'PATCH' + path
         payload = {
@@ -1924,27 +2201,99 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_guild_widget(self, guild_id: int) -> dict:
+        """Get the widget for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get widget for.
+
+        Returns
+        -------
+        dict
+            A guild widget object.
+        """        
         path = f'/guilds/{guild_id}/widget.json'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_vanity_code(self, guild_id: int) -> dict:
+        """Get the vanity URL for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the vanity URL for.
+
+        Returns
+        -------
+        dict
+            A partial invite object.
+        """        
         path = f'/guilds/{guild_id}/vanity-url'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def change_vanity_code(self, guild_id: int, code, reason: str = None) -> dict:
+        """Change the vanity URL for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to change the vanity URL for.
+        code : _type_
+            The vanity URL code.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/vanity-url'
         bucket = 'PATCH' + path
         payload = {'code': code}
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_guild_welcome_screen(self, guild_id: int) -> dict:
+        """Get the welcome screen for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the welcome screen for.
+
+        Returns
+        -------
+        dict
+            A welcome screen object.
+        """        
         path = f'/guilds/{guild_id}/welcome-screen'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def edit_guild_welcome_screen(self, guild_id: int, enabled: bool = None, welcome_channels: List[Any] = None, description: str = None, reason: str = None) -> dict:
+        """Edit the welcome screen for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit the welcome screen for.
+        enabled : bool, optional
+            Whether the welcome screen is enabled, by default None
+        welcome_channels : List[Any], optional
+            Channels linked in the welcome screen and their display options, by default None
+        description : str, optional
+            The server description to show in the welcome screen, by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A welcome screen object.
+        """        
         path = f'/guilds/{guild_id}/welcome-screen'
         bucket = 'PATCH' + path
 
@@ -1957,6 +2306,24 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, header={'X-Audit-Log-Reason': reason})
 
     async def edit_voice_state(self, guild_id: int, channel_id: int, suppress: bool = None, request_to_speak_timestamp: ISO8601_timestamp = None) -> dict:
+        """Edit the voice state for a user.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit the voice state for.
+        channel_id : int
+            The id of the channel the user is currently in.
+        suppress : bool, optional
+            Toggles the user's suppress state, by default None
+        request_to_speak_timestamp : ISO8601_timestamp, optional
+            Sets the user's request to speak, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/voice-states/@me'
         bucket = 'PATCH' + path
         payload = {
@@ -1969,6 +2336,24 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload)
 
     async def edit_users_voice_state(self, guild_id: int, user_id: int, channel_id: int, suppress: bool = None) -> dict:
+        """Edit the voice state for a user.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit the voice state for.
+        user_id : int
+            The ID of the user to edit the voice state for.
+        channel_id : int
+            The id of the channel the user is currently in
+        suppress : bool, optional
+            Toggles the user's suppress state, by default None
+
+        Returns
+        -------
+        dict
+            _description_
+        """        
         path = f'/guilds/{guild_id}/voice-states/{user_id}'
         bucket = 'PATCH' + path
         payload = {
@@ -1983,12 +2368,42 @@ class Paths:
     """
 
     async def get_scheduled_events(self, guild_id: int, with_user_count: bool) -> dict:
+        """Get the scheduled events for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the scheduled events for.
+        with_user_count : bool
+            Include number of users subscribed to each event.
+
+        Returns
+        -------
+        dict
+            A list of guild scheduled event objects.
+        """        
         path = f'/guilds/{guild_id}/scheduled-events'
         bucket = 'GET' + path
         params = {'with_user_count': with_user_count}
         return await self._request('GET', path, bucket, params=params)
 
     async def create_guild_scheduled_event(self, guild_id: int, reason: str = None, **payload: Any) -> dict:
+        """Create a scheduled event for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to create the scheduled event for.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+        payload : Any
+            The params for the JSON payload.
+
+        Returns
+        -------
+        dict
+            A guild scheduled event object.
+        """        
         path = f'/guilds/{guild_id}/scheduled-events'
         bucket = 'POST' + path
         valid_keys = (
@@ -2007,12 +2422,44 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_scheduled_event(self, guild_id: int, guild_scheduled_event_id: int, with_user_count: bool) -> dict:
+        """Get a scheduled event for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the scheduled event for.
+        guild_scheduled_event_id : int
+            The ID of the scheduled event to get.
+        with_user_count : bool
+            Include number of users subscribed to this event.
+
+        Returns
+        -------
+        dict
+            A guild scheduled event object.
+        """        
         path = f'/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}'
         bucket = 'GET' + path
         params = {'with_user_count': with_user_count}
         return await self._request('GET', path, bucket, params=params)
 
     async def edit_scheduled_event(self, guild_id: int, guild_scheduled_event_id: int, *, reason: str = None, **payload: Any) -> dict:
+        """Edit a scheduled event for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit the scheduled event for.
+        guild_scheduled_event_id : int
+            The ID of the scheduled event to edit.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A guild scheduled event object.
+        """        
         path = f'/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}'
         bucket = 'PATCH' + path
         valid_keys = (
@@ -2032,11 +2479,49 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_scheduled_event(self, guild_id: int, guild_scheduled_event_id: int, reason: str = None) -> dict:
+        """Delete a scheduled event for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to delete the scheduled event for.
+        guild_scheduled_event_id : int
+            The ID of the scheduled event to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def get_scheduled_event_users(self, guild_id: int, guild_scheduled_event_id: int, limit: int, with_member: bool, before: int = None, after: int = None) -> dict:
+        """Get the users subscribed to a scheduled event.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the scheduled event users for.
+        guild_scheduled_event_id : int
+            The ID of the scheduled event to get the users for.
+        limit : int
+            Number of users to return (up to maximum 100)
+        with_member : bool
+            Include guild member data if it exists
+        before : int, optional
+            Consider only users before given user id, by default None
+        after : int, optional
+            Consider only users after given user id, by default None
+
+        Returns
+        -------
+        dict
+            A list of guild scheduled event user objects.
+        """        
         path = f'/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/users'
         bucket = 'GET' + path
 
@@ -2057,11 +2542,37 @@ class Paths:
     """
 
     async def get_template(self, code: str) -> dict:
+        """Get a guild template.
+
+        Parameters
+        ----------
+        code : str
+            The code of the template to get.
+
+        Returns
+        -------
+        dict
+            A guild template object.
+        """        
         path = f'/guilds/templates/{code}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def create_from_template(self, code: str, name: str) -> dict:
+        """Create a guild from a template.
+
+        Parameters
+        ----------
+        code : str
+            The code of the template to create the guild from.
+        name : str
+            Name of the guild (2-100 characters).
+
+        Returns
+        -------
+        dict
+            A guild object.
+        """        
         path = f'/guilds/templates/{code}'
         bucket = 'POST' + path
         payload = {
@@ -2070,11 +2581,39 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload)
 
     async def get_guild_templates(self, guild_id: int) -> dict:
+        """Get a guild's templates.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the templates for.
+
+        Returns
+        -------
+        dict
+            A list of guild template objects.
+        """        
         path = f'/guilds/{guild_id}/templates'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def create_template(self, guild_id: int, name: str, description: str = None) -> dict:
+        """Create a template for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to create the template for.
+        name : str
+            Name of the template (1-100 characters).
+        description : str, optional
+            Description for the template (0-120 characters), by default None
+
+        Returns
+        -------
+        dict
+            A guild template object.
+        """        
         path = f'/guilds/{guild_id}/templates'
         bucket = 'POST' + path
         payload = {
@@ -2085,11 +2624,43 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload)
 
     async def sync_template(self, guild_id: int, code: str) -> dict:
+        """Sync a template for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to sync the template for.
+        code : str
+            The code of the template to sync.
+
+        Returns
+        -------
+        dict
+            A guild template object.
+        """        
         path = f'/guilds/{guild_id}/templates/{code}'
         bucket = 'PUT' + path
         return await self._request('PUT', path, bucket)
 
     async def edit_template(self, guild_id: int, code: str, name: str, description: str = None) -> dict:
+        """Edit a template for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to edit the template for.
+        code : str
+            The code of the template to edit.
+        name : str
+            Name of the template (1-100 characters)
+        description : str, optional
+            Description for the template (0-120 characters), by default None
+
+        Returns
+        -------
+        dict
+            A guild template object.
+        """        
         path = f'/guilds/{guild_id}/templates/{code}'
         bucket = 'PATCH' + path
         payload = {
@@ -2100,6 +2671,20 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload)
 
     async def delete_template(self, guild_id: int, code: str) -> dict:
+        """Delete a template for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to delete the template for.
+        code : str
+            The code of the template to delete.
+
+        Returns
+        -------
+        dict
+            A guild template object.
+        """        
         path = f'/guilds/{guild_id}/templates/{code}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
@@ -2109,6 +2694,24 @@ class Paths:
     """
 
     async def get_invite(self, invite_id: str, *, with_counts: bool = True, with_expiration: bool = True, guild_scheduled_event_id: int = None) -> dict:
+        """Get an invite.
+
+        Parameters
+        ----------
+        invite_id : str
+            The ID of the invite to get.
+        with_counts : bool, optional
+            Whether the invite should contain approximate member counts, by default True
+        with_expiration : bool, optional
+            Whether the invite should contain the expiration date, by default True
+        guild_scheduled_event_id : int, optional
+            The guild scheduled event to include with the invite, by default None
+
+        Returns
+        -------
+        dict
+            An invite object.
+        """        
         path = f'/invites/{invite_id}'
         bucket = 'GET' + path
         params = {
@@ -2122,6 +2725,20 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def delete_invite(self, invite_id: str, reason: str = None) -> dict:
+        """Delete an invite.
+
+        Parameters
+        ----------
+        invite_id : str
+            The ID of the invite to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            An invite object.
+        """        
         path = f'/invites/{invite_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
@@ -2130,7 +2747,21 @@ class Paths:
     Stage Instance
     """
 
-    async def create_stage_instance(self, reason: str, **payload: Any) -> dict:
+    async def create_stage_instance(self, *, reason: str = None, **payload: Any) -> dict:
+        """Create a stage instance.
+
+        Parameters
+        ----------
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+        payload : Any
+            The params for the JSON payload.
+
+        Returns
+        -------
+        dict
+            A stage instance object.
+        """               
         path = '/stage-instances'
         bucket = 'POST' + path
         valid_keys = (
@@ -2143,11 +2774,39 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_stage_instance(self, channel_id: int) -> dict:
+        """Get a stage instance.
+
+        Parameters
+        ----------
+        channel_id : int
+            The ID of the channel to get the stage instance for.
+
+        Returns
+        -------
+        dict
+            A stage instance object.
+        """        
         path = f'/stage-instances/{channel_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def edit_stage_instance(self, channel_id: int, *, reason: str = None, **payload: Any) -> dict:
+        """Edit a stage instance.
+
+        Parameters
+        ----------
+        channel_id : int
+            The ID of the channel to edit the stage instance for.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+        payload : Any
+            The params for the JSON payload.
+
+        Returns
+        -------
+        dict
+            A stage instance object.
+        """        
         path = f'/stage-instances/{channel_id}'
         bucket = 'PATCH' + path
         valid_keys = (
@@ -2159,6 +2818,20 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_stage_instance(self, channel_id: int, reason: str = None) -> dict:
+        """Delete a stage instance.
+
+        Parameters
+        ----------
+        channel_id : int
+            The ID of the channel to delete the stage instance for.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/stage-instances/{channel_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
@@ -2168,21 +2841,66 @@ class Paths:
     """
 
     async def get_sticker(self, sticker_id: int) -> dict:
+        """Get a sticker.
+
+        Parameters
+        ----------
+        sticker_id : int
+            The ID of the sticker to get.
+
+        Returns
+        -------
+        dict
+            A sticker object.
+        """        
         path = f'/stickers/{sticker_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def list_nitro_sticker_packs(self) -> dict:
+        """List all nitro sticker packs.
+
+        Returns
+        -------
+        dict
+            A list of sticker pack objects.
+        """        
         path = '/sticker-packs'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def list_guild_stickers(self, guild_id: int) -> dict:
+        """List all stickers in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to list stickers for.
+
+        Returns
+        -------
+        dict
+            A list of sticker objects.
+        """        
         path = f'/guilds/{guild_id}/stickers'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_guild_sticker(self, guild_id: int, sticker_id: int) -> dict:
+        """Get a sticker in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the sticker for.
+        sticker_id : int
+            The ID of the sticker to get.
+
+        Returns
+        -------
+        dict
+            A sticker object.
+        """        
         path = f'/guilds/{guild_id}/stickers/{sticker_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
@@ -2224,6 +2942,28 @@ class Paths:
     """
 
     async def modify_guild_sticker(self, guild_id: int, sticker_id: int, *, name: str = None, description: str = None, tags: str = None, reason: str = None) -> dict:
+        """Modify a sticker in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to modify the sticker for.
+        sticker_id : int
+            The ID of the sticker to modify.
+        name : str, optional
+            Name of the sticker (2-30 characters), by default None
+        description : str, optional
+            Description of the sticker (2-100 characters), by default None
+        tags : str, optional
+            Autocomplete/suggestion tags for the sticker (max 200 characters), by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A sticker object.
+        """        
         path = f'/guilds/{guild_id}/stickers/{sticker_id}'
         bucket = 'PATCH' + path
         payload = {}
@@ -2237,6 +2977,22 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_guild_sticker(self, guild_id: int, sticker_id: int, reason: str = None) -> dict:
+        """Delete a sticker in a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to delete the sticker for.
+        sticker_id : int
+            The ID of the sticker to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/guilds/{guild_id}/stickers/{sticker_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
@@ -2246,16 +3002,47 @@ class Paths:
     """
 
     async def get_current_user(self) -> dict:
+        """Get the current user.
+
+        Returns
+        -------
+        dict
+            A user object.
+        """        
         path = '/users/@me'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_user(self, user_id: int) -> dict:
+        """Get a user.
+
+        Parameters
+        ----------
+        user_id : int
+            The ID of the user to get.
+
+        Returns
+        -------
+        dict
+            A user object.
+        """        
         path = f'/users/{user_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def edit_current_user(self, username: str) -> dict:
+        """Edit the current user.
+
+        Parameters
+        ----------
+        username : str
+            The new username.
+
+        Returns
+        -------
+        dict
+            A user object.
+        """        
         path = '/users/@me'
         bucket = 'PATCH' + path
         payload = {
@@ -2264,6 +3051,27 @@ class Paths:
         return await self._request('PATCH', path, bucket, json=payload)
 
     async def get_current_user_guilds(self, limit: int = 200, before: int = None, after: int = None) -> dict:
+        """Get the current user's guilds.
+
+        Parameters
+        ----------
+        limit : int, optional
+            Max number of guilds to return (1-200), by default 200
+        before : int, optional
+            Get guilds before this guild ID, by default None
+        after : int, optional
+            Get guilds after this guild ID, by default None
+
+        Returns
+        -------
+        dict
+            A list of partial guild objects.
+
+        Raises
+        ------
+        InvalidParams
+            If the limit is not between 1 and 200.
+        """        
         path = '/users/@me/guilds'
         bucket = 'GET' + path
         if 1 > limit or limit > 200:
@@ -2281,16 +3089,52 @@ class Paths:
         return await self._request('GET', path, bucket, params=params)
 
     async def get_current_user_guild_member(self, guild_id: int) -> dict:
+        """Get the current user's guild member.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the member for.
+
+        Returns
+        -------
+        dict
+            A guild member object.
+        """        
         path = f'/users/@me/guilds/{guild_id}/member'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def leave_guild(self, guild_id: int) -> dict:
+        """Leave a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to leave.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/users/@me/guilds/{guild_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket)
 
     async def create_DM(self, recipient_id: int) -> dict:
+        """Open a DM.
+
+        Parameters
+        ----------
+        recipient_id : int
+            The ID of the user to open a DM with.
+
+        Returns
+        -------
+        dict
+            A DM channel object.                  
+        """        
         payload = {
             'recipient_id': recipient_id,
         }
@@ -2300,6 +3144,20 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload)
 
     async def create_group_DM(self, access_tokens: List[str], nicks: Dict[int, str] = None) -> dict:
+        """Open a group DM.
+
+        Parameters
+        ----------
+        access_tokens : List[str]
+            Access tokens of users that have granted your app the gdm.join scope
+        nicks : Dict[int, str], optional
+            A dictionary of user ids to their respective nicknames, by default None
+
+        Returns
+        -------
+        dict
+            A DM channel object.
+        """        
         payload = {
             'access_tokens': access_tokens,
         }
@@ -2309,6 +3167,13 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload)
 
     async def get_connections(self) -> dict:
+        """Get the current user's connections.
+
+        Returns
+        -------
+        dict
+            A list of connection objects.
+        """        
         path = '/users/@me/connections'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
@@ -2318,6 +3183,13 @@ class Paths:
     """
 
     async def list_voice_regions(self) -> dict:
+        """Get a list of voice regions.
+
+        Returns
+        -------
+        dict
+            A list of voice region objects.
+        """        
         path = '/voice/regions'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
@@ -2327,6 +3199,22 @@ class Paths:
     """
 
     async def create_webhook(self, channel_id: int, name: str, reason: str = None) -> dict:
+        """Create a webhook.
+
+        Parameters
+        ----------
+        channel_id : int
+            The ID of the channel to create the webhook in.
+        name : str
+            Name of the webhook (1-80 characters).
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A webhook object.
+        """        
         path = f'/channels/{channel_id}/webhooks'
         bucket = 'POST' + path
         payload = {
@@ -2336,27 +3224,94 @@ class Paths:
         return await self._request('POST', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
     async def get_channel_webhooks(self, channel_id: int) -> dict:
+        """Get a list of webhooks for a channel.
+
+        Parameters
+        ----------
+        channel_id : int
+            The ID of the channel to get the webhooks for.
+
+        Returns
+        -------
+        dict
+            A list of webhook objects.
+        """        
         path = f'/channels/{channel_id}/webhooks'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_guild_webhooks(self, guild_id: int) -> dict:
+        """Get a list of webhooks for a guild.
+
+        Parameters
+        ----------
+        guild_id : int
+            The ID of the guild to get the webhooks for.
+
+        Returns
+        -------
+        dict
+            A list of webhook objects.
+        """        
         path = f'/guilds/{guild_id}/webhooks'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_webhook(self, webhook_id: int) -> dict:
+        """Get a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to get.
+
+        Returns
+        -------
+        dict
+            A webhook object.
+        """        
         path = f'/webhooks/{webhook_id}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def get_webhook_with_token(self, webhook_id: int, webhook_token: str) -> dict:
-        #Doesn't need to auth
+        """Get a webhook with a token.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to get.
+        webhook_token : str
+            The token of the webhook to get.
+
+        Returns
+        -------
+        dict
+            A webhook object.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket, auth=False)
 
     async def edit_webhook(self, webhook_id: int, name: str = None, channel_id: int = None, reason: str = None) -> dict:
+        """Edit a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to edit.
+        name : str, optional
+            The default name of the webhook, by default None
+        channel_id : int, optional
+            The new channel id this webhook should be moved to, by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A webhook object.
+        """        
         path = f'/webhooks/{webhook_id}'
         bucket = 'PATCH' + path
         payload = {}
@@ -2367,32 +3322,112 @@ class Paths:
 
         return await self._request('PATCH', path, bucket, json=payload, headers={'X-Audit-Log-Reason': reason})
 
-    async def edit_webhook_with_token(self, webhook_id: int, webhook_token: str, name:str = None, channel_id: int = None, reason: str = None) -> dict:
-        # Doesn't need to auth
+    async def edit_webhook_with_token(self, webhook_id: int, webhook_token: str, name:str = None, reason: str = None) -> dict:
+        """Edit a webhook with a token.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to edit.
+        webhook_token : str
+            The token of the webhook to edit.
+        name : str, optional
+            The default name of the webhook, by default None
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            A webhook object.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}'
         bucket = 'PATCH' + path
         payload = {}
 
         if name is not None:
             payload['name'] = name
-        if channel_id is not None:
-            payload['channel_id'] = channel_id
 
         return await self._request('PATCH', path, bucket, json=payload, auth=False, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_webhook(self, webhook_id: int, reason: str = None) -> dict:
+        """Delete a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/webhooks/{webhook_id}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, headers={'X-Audit-Log-Reason': reason})
 
     async def delete_webhook_with_token(self, webhook_id: int, webhook_token: str, reason: str = None) -> dict:
-        # Doesn't need to auth
+        """Delete a webhook with a token.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to delete.
+        webhook_token : str
+            The token of the webhook to delete.
+        reason : str, optional
+            A reason for this action that will be displayed in the audit log, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}'
         bucket = 'DELETE' + path
         return await self._request('DELETE', path, bucket, auth=False, headers={'X-Audit-Log-Reason': reason})
 
     async def execute_webhook(self, webhook_id: int, webhook_token: str, wait: bool = False, thread_id: int = None, content: str = None, username: str = None, avatar_url: str = None, tts: bool = False, embeds: List[dict] = None, allowed_mentions: Any = None, components: List[Any] = None) -> dict:
-        # Doesn't need to auth
+        """Execute a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to execute.
+        webhook_token : str
+            The token of the webhook to execute.
+        wait : bool, optional
+            Waits for server confirmation of message send before response, and returns the created message body, by default False
+        thread_id : int, optional
+            Send a message to the specified thread within a webhook's channel, by default None
+        content : str, optional
+            The message contents (up to 2000 characters), by default None
+        username : str, optional
+            Override the default username of the webhook, by default None
+        avatar_url : str, optional
+            Override the default avatar of the webhook, by default None
+        tts : bool, optional
+            True if this is a TTS message, by default False
+        embeds : List[dict], optional
+            Embedded rich content, by default None
+        allowed_mentions : Any, optional
+            Allowed mentions for the message, by default None
+        components : List[Any], optional
+            The components to include with the message, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+
+        Raises
+        ------
+        InvalidParams
+            If content or embeds are provided.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}'
         bucket = 'POST' + path
         if content is None and embeds is None:
@@ -2423,14 +3458,56 @@ class Paths:
         
         return await self._request('POST', path, bucket, json=payload, params=params, auth=False)
 
-    async def get_webhook_message(self, webhook_id: int, webhook_token: str, message_id: int) -> dict:
-        # Doesn't need to auth
+    async def get_webhook_message(self, webhook_id: int, webhook_token: str, message_id: int, thread_id : id = None) -> dict:
+        """Get a message from a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to get the message from.
+        webhook_token : str
+            The token of the webhook to get the message from.
+        message_id : int
+            The ID of the message to get.
+        thread_id : id, optional
+            The ID of the thread to get the message from, by default None
+
+        Returns
+        -------
+        dict
+            A message object.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}'
         bucket = 'GET' + path
         return self._request('GET', path, bucket, auth=False)
 
     async def edit_webhook_message(self, webhook_id: int, webhook_token: str, message_id: int, thread_id: int = None, content: str = None, embeds: List[dict] = None, allowed_mentions: Any = None, components: List[Any] = None) -> dict:
-        # Doesn't need to auth
+        """Edit a message from a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to edit the message from.
+        webhook_token : str
+            The token of the webhook to edit the message from.
+        message_id : int
+            The ID of the message to edit.
+        thread_id : int, optional
+            ID of the thread the message is in, by default None
+        content : str, optional
+            The message contents (up to 2000 characters), by default None
+        embeds : List[dict], optional
+            Embedded rich content, by default None
+        allowed_mentions : Any, optional
+            Allowed mentions for the message, by default None
+        components : List[Any], optional
+            The components to include with the message, by default None
+
+        Returns
+        -------
+        dict
+            A message object.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}'
         bucket = 'PATCH' + path
 
@@ -2443,7 +3520,22 @@ class Paths:
         return self._request('PATCH', path, bucket, json=payload, auth=False)
 
     async def delete_webhook_message(self, webhook_id: int, webhook_token: str, message_id: int) -> dict:
-        # Doesn't need to auth
+        """Delete a message from a webhook.
+
+        Parameters
+        ----------
+        webhook_id : int
+            The ID of the webhook to delete the message from.
+        webhook_token : str
+            The token of the webhook to delete the message from.
+        message_id : int
+            The ID of the message to delete.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}'
         bucket = 'DELETE' + path
         return self._request('DELETE', path, bucket, auth=False)
@@ -2453,6 +3545,24 @@ class Paths:
     """
 
     async def create_interaction_response(self, interaction_id: int, interaction_token: str, type: int, data: Any = None) -> dict:
+        """Create an interaction response.
+
+        Parameters
+        ----------
+        interaction_id : int
+            The ID of the interaction to create the response for.
+        interaction_token : str
+            The token of the interaction to create the response for.
+        type : int
+            The type of response to create.
+        data : Any, optional
+            An optional response message, by default None
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/interactions/{interaction_id}/{interaction_token}/callback'
         bucket = 'POST' + path
         payload = {
@@ -2463,11 +3573,47 @@ class Paths:
         return self._request('POST', path, bucket, json=payload)
 
     async def get_original_interaction_response(self, application_id: int, interaction_token: str) -> dict:
+        """Get the original interaction response.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to get the original interaction response for.
+        interaction_token : str
+            The token of the interaction to get the original interaction response for.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/webhooks/{application_id}/{interaction_token}/messages/@original'
         bucket = 'GET' + path
         return self._request('GET', path, bucket)
 
     async def edit_original_interaction_response(self, application_id: int, interaction_token: str, content: str = None, embeds: List[dict] = None, allowed_mentions: Any = None, components: List[Any] = None) -> dict:
+        """Edit the original interaction response.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to edit the original interaction response for.
+        interaction_token : str
+            The token of the interaction to edit the original interaction response for.
+        content : str, optional
+            The message contents (up to 2000 characters), by default None
+        embeds : List[dict], optional
+            Embedded rich content, by default None
+        allowed_mentions : Any, optional
+            Allowed mentions for the message, by default None
+        components : List[Any], optional
+            The components to include with the message, by default None
+
+        Returns
+        -------
+        dict
+            A message object.
+        """        
         path = f'/webhooks/{application_id}/{interaction_token}/messages/@original'
         bucket = 'PATCH' + path
 
@@ -2481,11 +3627,49 @@ class Paths:
         return self._request('PATCH', path, bucket, json=payload)
 
     async def delete_original_interaction_response(self, application_id: int, interaction_token: str) -> dict:
+        """Delete the original interaction response.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to delete the original interaction response for.
+        interaction_token : str
+            The token of the interaction to delete the original interaction response for.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/webhooks/{application_id}/{interaction_token}/messages/@original'
         bucket = 'DELETE' + path
         return self._request('DELETE', path, bucket)
 
     async def create_followup_message(self, application_id: int, interaction_token: str, content: str = None, tts: bool = None, embeds: List[dict] = None, allowed_mentions: Any = None, components: List[Any] = None) -> dict:
+        """Create a followup message.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to create the followup message for.
+        interaction_token : str
+            The token of the interaction to create the followup message for.
+        content : str, optional
+            The message contents (up to 2000 characters), by default None
+        tts : bool, optional
+            True if this is a TTS message, by default None
+        embeds : List[dict], optional
+            Embedded rich content, by default None
+        allowed_mentions : Any, optional
+            Allowed mentions for the message, by default None
+        components : List[Any], optional
+            The components to include with the message, by default None
+
+        Returns
+        -------
+        dict
+            A message object.
+        """        
         path = f'/webhooks/{application_id}/{interaction_token}'
         bucket = 'POST' + path
 
@@ -2505,11 +3689,51 @@ class Paths:
         return self._request('POST', path, bucket, json=payload)
 
     async def get_followup_message(self, application_id: int, interaction_token: str, message_id: int) -> dict:
+        """Get a followup message.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to get the followup message for.
+        interaction_token : str
+            The token of the interaction to get the followup message for.
+        message_id : int
+            The ID of the message to get.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = f'/webhooks/{application_id}/{interaction_token}/messages/{message_id}'
         bucket = 'GET' + path
         return self._request('GET', path, bucket)
 
     async def edit_followup_message(self, application_id: int, interaction_token: str, message_id: int, content: str = None, embeds: List[dict] = None, allowed_mentions: Any = None, components: List[Any] = None) -> dict:
+        """Edit a followup message.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to edit the followup message for.
+        interaction_token : str
+            The token of the interaction to edit the followup message for.
+        message_id : int
+            The ID of the message to edit.
+        content : str, optional
+            The message contents (up to 2000 characters), by default None
+        embeds : List[dict], optional
+            Embedded rich content, by default None
+        allowed_mentions : Any, optional
+            Allowed mentions for the message, by default None
+        components : List[Any], optional
+            The components to include with the message, by default None
+
+        Returns
+        -------
+        dict
+            A message object.
+        """        
         path = f'/webhooks/{application_id}/{interaction_token}/messages/{message_id}'
         bucket = 'PATCH' + path
 
@@ -2522,32 +3746,85 @@ class Paths:
 
         return self._request('PATCH', path, bucket, json=payload)
 
-    async def delete_followup_message(self, application_id: int, interaction_token: str, message_id: int) -> dict:
+    async def delete_followup_message(self, application_id: int, interaction_token: str, message_id: int, thread_id : id = None) -> dict:
+        """Delete a followup message.
+
+        Parameters
+        ----------
+        application_id : int
+            The ID of the application to delete the followup message for.
+        interaction_token : str
+            The token of the interaction to delete the followup message for.
+        message_id : int
+            The ID of the message to delete.
+        thread_id : id, optional
+            ID of the thread the message is in, by default None
+        
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """
+        payload = {}
+        if thread_id is not None:
+            payload['thread_id'] = thread_id
         path = f'/webhooks/{application_id}/{interaction_token}/messages/{message_id}'
         bucket = 'DELETE' + path
-        return self._request('DELETE', path, bucket)
+        return self._request('DELETE', path, bucket, payload=payload)
 
     """
     Misc
     """
 
     async def get_gateway(self) -> dict:
-        # No token needed
+        """Get the gateway URL.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = '/gateway'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket, auth=False)
 
     async def get_bot_gateway(self) -> dict:
+        """Get the gateway URL for a bot.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = '/gateway/bot'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
 
     async def application_info(self) -> dict:
+        """Get the application info.
+
+        Returns
+        -------
+        dict
+            An application object.
+        """        
         path = '/oauth2/applications/@me'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket)
     
     async def authorisation_info(self, bearer_token: str) -> dict:
+        """Get the authorisation info.
+
+        Parameters
+        ----------
+        bearer_token : str
+            The bearer token to get the authorisation info for.
+
+        Returns
+        -------
+        dict
+            The response from Discord.
+        """        
         path = '/oauth2/@me'
         bucket = 'GET' + path
         return await self._request('GET', path, bucket, headers={'Authorization': f'Bearer {bearer_token}'}, auth=False) # auth is False as a bearer_token is used
