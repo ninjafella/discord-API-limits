@@ -16,11 +16,15 @@ Basic usage
 
    import discord_limits
    import os
+   import asyncio
 
-   client = discord_limits.DiscordClient(os.environ.get('TOKEN'))
+   limitsClient = discord_limits.DiscordClient(os.environ.get('TOKEN'))
 
-   channel_id = 123456789012345678
-   await client.send_message(channel_id, content="Hello, world!")
+   async def main():
+      await limitsClient.create_message(123456789012345678, content='Hello World!')
+
+
+   asyncio.get_event_loop().run_until_complete(main())
 
 
 Requires:
