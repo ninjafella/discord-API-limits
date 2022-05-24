@@ -8,8 +8,6 @@ class Paths:
     def __init__(self, client):
         self._client = client
 
-    # Check for 'raise' statements
-
     """
     Audit Log
     """
