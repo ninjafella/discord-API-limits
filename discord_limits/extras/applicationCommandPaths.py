@@ -1,5 +1,6 @@
 from discord_limits.errors import *
 import discord_limits
+from aiohttp import ClientResponse
 
 class ApplicationCommandPaths:
     """
@@ -21,7 +22,7 @@ class ApplicationCommandPaths:
 
     # Application commands (global)
 
-    async def get_global_application_commands(self, application_id: int) -> dict:
+    async def get_global_application_commands(self, application_id: int) -> ClientResponse:
         """Fetch all of the global commands for an application.
 
         Parameters
@@ -31,14 +32,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A list of application command objects.
         """        
         path = f'/applications/{application_id}/commands'
         bucket = 'GET' + path
         return await self._client._request('GET', path, bucket)
 
-    async def create_global_application_command(self, application_id: int, payload: dict) -> dict:
+    async def create_global_application_command(self, application_id: int, payload: dict) -> ClientResponse:
         """Create a global command.
 
         Parameters
@@ -50,14 +51,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             An application command object.
         """        
         path = f'/applications/{application_id}/commands'
         bucket = 'POST' + path
         return await self._client._request('POST', path, bucket, json=payload)
 
-    async def get_global_application_command(self, application_id: int, command_id: int) -> dict:
+    async def get_global_application_command(self, application_id: int, command_id: int) -> ClientResponse:
         """Get a global command.
 
         Parameters
@@ -69,14 +70,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             An application command object.
         """        
         path = f'/applications/{application_id}/commands/{command_id}'
         bucket = 'GET' + path
         return await self._client._request('GET', path, bucket)
 
-    async def edit_global_application_command(self, application_id: int, command_id: int, payload: dict) -> dict:
+    async def edit_global_application_command(self, application_id: int, command_id: int, payload: dict) -> ClientResponse:
         """Edit a global command.
 
         Parameters
@@ -90,7 +91,7 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             An application command object.
         """        
         path = f'/applications/{application_id}/commands/{command_id}'
@@ -103,7 +104,7 @@ class ApplicationCommandPaths:
         payload = {k: v for k, v in payload.items() if k in valid_keys}
         return await self._client._request('PATCH', path, bucket, json=payload)
 
-    async def delete_global_application_command(self, application_id: int, command_id: int) -> dict:
+    async def delete_global_application_command(self, application_id: int, command_id: int) -> ClientResponse:
         """Delete a global command.
 
         Parameters
@@ -115,14 +116,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             The response from Discord.
         """        
         path = f'/applications/{application_id}/commands/{command_id}'
         bucket = 'DELETE' + path
         return await self._client._request('DELETE', path, bucket)
 
-    async def bulk_overwrite_global_application_commands(self, application_id: int, payload: dict) -> dict:
+    async def bulk_overwrite_global_application_commands(self, application_id: int, payload: dict) -> ClientResponse:
         """Bulk edit global commands.
 
         Parameters
@@ -134,7 +135,7 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A list of application command objects.
         """        
         path = f'/applications/{application_id}/commands'
@@ -143,7 +144,7 @@ class ApplicationCommandPaths:
 
     # Application commands (guild)
 
-    async def get_guild_application_commands(self, application_id: int, guild_id: int, with_localisations : bool = False) -> dict:
+    async def get_guild_application_commands(self, application_id: int, guild_id: int, with_localisations : bool = False) -> ClientResponse:
         """Fetch all of the guild commands for an application.
 
         Parameters
@@ -157,14 +158,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A list of application command objects.
         """              
         path = f'/applications/{application_id}/guilds/{guild_id}/commands'
         bucket = 'GET' + path
         return await self._client._request('GET', path, bucket)
 
-    async def create_guild_application_command(self, application_id: int, guild_id: int, payload: dict) -> dict:
+    async def create_guild_application_command(self, application_id: int, guild_id: int, payload: dict) -> ClientResponse:
         """Create a guild command.
 
         Parameters
@@ -178,14 +179,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             An application command object.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands'
         bucket = 'POST' + path
         return await self._client._request('POST', path, bucket, json=payload)
 
-    async def get_guild_application_command(self, application_id: int, guild_id: int, command_id: int) -> dict:
+    async def get_guild_application_command(self, application_id: int, guild_id: int, command_id: int) -> ClientResponse:
         """Get a guild command.
 
         Parameters
@@ -199,14 +200,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             An application command object.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands/{command_id}'
         bucket = 'GET' + path
         return await self._client._request('GET', path, bucket)
 
-    async def edit_guild_application_command(self, application_id: int, guild_id: int, command_id: int, payload: dict) -> dict:
+    async def edit_guild_application_command(self, application_id: int, guild_id: int, command_id: int, payload: dict) -> ClientResponse:
         """Edit a guild command.
 
         Parameters
@@ -222,7 +223,7 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             An application command object.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands/{command_id}'
@@ -235,7 +236,7 @@ class ApplicationCommandPaths:
         payload = {k: v for k, v in payload.items() if k in valid_keys}
         return await self._client._request('PATCH', path, bucket, json=payload)
 
-    async def delete_guild_application_command(self, application_id: int, guild_id: int, command_id: int) -> dict:
+    async def delete_guild_application_command(self, application_id: int, guild_id: int, command_id: int) -> ClientResponse:
         """Delete a guild command.
 
         Parameters
@@ -249,14 +250,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             The response from Discord.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands/{command_id}'
         bucket = 'DELETE' + path
         return await self._client._request('DELETE', path, bucket)
 
-    async def bulk_overwrite_guild_application_commands(self, application_id: int, guild_id: int, payload: dict) -> dict:
+    async def bulk_overwrite_guild_application_commands(self, application_id: int, guild_id: int, payload: dict) -> ClientResponse:
         """Bulk overwrite guild commands.
 
         Parameters
@@ -270,14 +271,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A list of application command objects.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands'
         bucket = 'PUT' + path
         return await self._client._request('PUT', path, bucket, json=payload)
 
-    async def get_guild_application_command_permissions(self, application_id: int, guild_id: int) -> dict:
+    async def get_guild_application_command_permissions(self, application_id: int, guild_id: int) -> ClientResponse:
         """Fetch all of the guild application command permissions for an application.
 
         Parameters
@@ -289,14 +290,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A list of guild application command permissions objects.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands/permissions'
         bucket = 'GET' + path
         return await self._client._request('GET', path, bucket)
 
-    async def get_application_command_permissions(self, application_id: int, guild_id: int, command_id: int) -> dict:
+    async def get_application_command_permissions(self, application_id: int, guild_id: int, command_id: int) -> ClientResponse:
         """Get permissions for a specific command for your application in a guild.
 
         Parameters
@@ -310,14 +311,14 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A guild application command permissions object.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions'
         bucket = 'GET' + path
         return await self._client._request('GET', path, bucket)
 
-    async def edit_application_command_permissions(self, application_id: int, guild_id: int, command_id: int, payload: dict) -> dict:
+    async def edit_application_command_permissions(self, application_id: int, guild_id: int, command_id: int, payload: dict) -> ClientResponse:
         """Edit a guild application command permissions.
 
         Parameters
@@ -333,7 +334,7 @@ class ApplicationCommandPaths:
 
         Returns
         -------
-        dict
+        ClientResponse
             A guild application command permissions object.
         """        
         path = f'/applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions'

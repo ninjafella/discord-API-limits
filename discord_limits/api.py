@@ -85,7 +85,7 @@ class DiscordClient(Paths):
                     response_data = await r.json()
                 try:
                     if await self._check_response(response=r, bucket=bucket):
-                        return response_data
+                        return r
                 except TooManyRequests as e:
                     if self._retry_rate_limits is True:
                         timeout = response_data['retry_after'] / 1000 + 1

@@ -39,9 +39,6 @@ class BucketHandler:
         for key in header_attrs:
             value = r.headers.get(key)
             if value is not None:
-                print(value)
-                value = int(float(value))
-                print(value)
                 if key == 'X-RateLimit-Reset':
                     value = datetime.utcfromtimestamp(value)
             limits[header_attrs[key]] = value
@@ -95,4 +92,3 @@ class ClientRateLimits:
 
     def is_limited(self, bucket: str):
         return bucket in self.currently_limited()
-
