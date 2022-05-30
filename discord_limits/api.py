@@ -20,9 +20,9 @@ class DiscordClient(Paths):
         Whether the client will sleep and retry after 429 errors, by default True
     api_version : int, optional
         The Discord API version to use, by default 9
-    """  
-    
-    def __init__(self, token: str, token_type: str = 'bot', prevent_rate_limits: bool = True, retry_rate_limits: bool = True, api_version: int = 9):      
+    """
+
+    def __init__(self, token: str, token_type: str = 'bot', prevent_rate_limits: bool = True, retry_rate_limits: bool = True, api_version: int = 9):
         super().__init__(self)
         if token_type == 'bot':
             self.token = f"Bot {token}"
@@ -70,7 +70,7 @@ class DiscordClient(Paths):
             else:
                 headers['Authorization'] = self.token
         cs = ClientSession()
-        
+
         url = self._base_url + path
 
         request_manager = cs.request(method, url, json=json, params=params, headers=headers)
@@ -82,12 +82,12 @@ class DiscordClient(Paths):
                 async with cs:
                     r = await request_manager
                     bh.check_limit_headers(r)  # sets up the bucket rate limit attributes w/ response headers
-                    response_data = await r.json()
                 try:
                     if await self._check_response(response=r, bucket=bucket):
                         return r
                 except TooManyRequests as e:
                     if self._retry_rate_limits is True:
+                        response_data = await r.json()
                         timeout = response_data['retry_after'] / 1000 + 1
                         await asyncio.sleep(timeout)
                         # reschedule same request
@@ -103,11 +103,11 @@ class DiscordClient(Paths):
         """Checks API response for errors. Returns True only on 300 > status >= 200"""
         status = response.status
         reason = response.reason
-        data = await response.json()
 
         if 300 > status >= 200:
             return True
         elif status == 429:
+            data = await response.json()
             message = data['message']
             if 'global' in data:
                 text = f"Global rate limit. {data['message']}"
