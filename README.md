@@ -1,5 +1,5 @@
 [![Documentation Status](https://readthedocs.org/projects/discord-limits/badge/?version=latest)](https://discord-limits.readthedocs.io/en/latest/?badge=latest)
-[![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](https://img.shields.io/badge/Version-v1.0.0-blue)
+[![Version](https://img.shields.io/badge/Version-v1.1.0-blue)](https://img.shields.io/badge/Version-v1.1.1-blue)
 
 # discord_limits
 

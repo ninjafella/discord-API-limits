@@ -30,7 +30,7 @@ class BucketHandler:
                 f"reset={self.reset}, retry_after={self.retry_after})")
 
     def check_limit_headers(self, r: ClientResponse):
-        limits = dict()
+        limits = {}
         header_attrs = {
             'X-RateLimit-Limit': 'limit',
             'X-RateLimit-Remaining': 'remaining',
@@ -40,7 +40,7 @@ class BucketHandler:
             value = r.headers.get(key)
             if value is not None:
                 if key == 'X-RateLimit-Reset':
-                    value = datetime.utcfromtimestamp(value)
+                    value = datetime.utcfromtimestamp(float(value))
             limits[header_attrs[key]] = value
         for k, v in limits.items():
             setattr(self, k, v)
