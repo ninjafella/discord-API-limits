@@ -1,7 +1,7 @@
 from user import User
 
 
-class emojiClass:
+class Emoji:
     def __init__(self, data):
         self.id = data.get("id")
         self.name = data.get("name")

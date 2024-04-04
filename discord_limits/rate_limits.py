@@ -15,31 +15,34 @@ class BucketHandler:
             bucket_name: BucketHandler
         }
     """
+
     limit: int = None
     remaining: int = None
     reset: datetime = None
     retry_after: float = None
+    prevent_429: bool = False
     cond = None
-    prevent_429 = False
 
     def __init__(self, bucket: str):
         self.bucket = bucket
 
     def __repr__(self):
-        return (f"RateLimit(bucket={self.bucket}, limit={self.limit}, remaining={self.remaining}, "
-                f"reset={self.reset}, retry_after={self.retry_after})")
+        return (
+            f"RateLimit(bucket={self.bucket}, limit={self.limit}, remaining={self.remaining}, "
+            f"reset={self.reset}, retry_after={self.retry_after})"
+        )
 
     def check_limit_headers(self, r: ClientResponse):
         limits = {}
         header_attrs = {
-            'X-RateLimit-Limit': 'limit',
-            'X-RateLimit-Remaining': 'remaining',
-            'X-RateLimit-Reset': 'reset',
+            "X-RateLimit-Limit": "limit",
+            "X-RateLimit-Remaining": "remaining",
+            "X-RateLimit-Reset": "reset",
         }
         for key in header_attrs:
             value = r.headers.get(key)
             if value is not None:
-                if key == 'X-RateLimit-Reset':
+                if key == "X-RateLimit-Reset":
                     value = datetime.utcfromtimestamp(float(value))
             limits[header_attrs[key]] = value
         for k, v in limits.items():
@@ -72,7 +75,9 @@ class ClientRateLimits:
     buckets: Dict[str, BucketHandler] = dict()
 
     def __init__(self, prevent_rate_limits: bool):
-        self.global_limiter = AsyncLimiter(50, 1) if prevent_rate_limits is True else AsyncNonLimiter()
+        self.global_limiter = (
+            AsyncLimiter(50, 1) if prevent_rate_limits is True else AsyncNonLimiter()
+        )
 
     def currently_limited(self) -> List[str]:
         """
@@ -80,7 +85,11 @@ class ClientRateLimits:
             Returns a list of the buckets (str) that are currently being limited.
         """
         now = datetime.utcnow()
-        limited = [k for k, v in self.buckets.items() if v.reset is not None and v.reset > now and v.remaining == 0]
+        limited = [
+            k
+            for k, v in self.buckets.items()
+            if v.reset is not None and v.reset > now and v.remaining == 0
+        ]
         return limited
 
     def any_limited(self) -> bool:

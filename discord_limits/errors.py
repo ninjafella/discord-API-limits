@@ -1,9 +1,10 @@
-
 class DiscordClientError(Exception):
     pass
 
+
 class InvalidParams(Exception):
     pass
+
 
 class ResponseError(DiscordClientError):
     pass
@@ -42,20 +43,5 @@ api_errors = {
     401: Unauthorized,
     403: Forbidden,
     429: TooManyRequests,
-    500: InternalServerError
+    500: InternalServerError,
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-#https://discord.com/developers/docs/topics/threads
+# https://discord.com/developers/docs/topics/threads
 class Thread:
     def __init__(self, data):
         self.id = data.get("id")

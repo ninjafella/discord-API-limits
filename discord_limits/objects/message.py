@@ -12,13 +12,15 @@ class Message:
         self.mentions = data.get("mentions")
         self.mention_roles = data.get("mention_roles")
         self.mention_everyone = data.get("mention_everyone")
-        self.nonce = data.get("nonce") #Used for validating a message was sent
+        self.nonce = data.get("nonce")  # Used for validating a message was sent
         try:
             self.member = Member(data.get("member"))
         except Exception:
             self.member = None
         self.id = data.get("id")
-        self.flags = data.get("flags") #https://discord.com/developers/docs/resources/channel#message-object-message-flags
+        self.flags = data.get(
+            "flags"
+        )  # https://discord.com/developers/docs/resources/channel#message-object-message-flags
         self.embeds = data.get("embeds")
         self.edited_timestamp = data.get("edited_timestamp")
         self.content = data.get("content")

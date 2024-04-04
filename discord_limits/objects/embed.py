@@ -1,6 +1,6 @@
 class Embed:
-    def __init__(self, title="", description="", colour=0xff0000):
-        #https://discord.com/developers/docs/resources/channel#embed-object
+    def __init__(self, title="", description="", colour=0xFF0000):
+        # https://discord.com/developers/docs/resources/channel#embed-object
         self.title = title
         self.description = description
         colour = str(colour)
@@ -21,11 +21,7 @@ class Embed:
         self.result["footer"]["text"] = text
 
     def add_field(self, name="", value="", inline=False):
-        field = {
-            "name": name,
-            "value": value,
-            "inline": inline
-        }
+        field = {"name": name, "value": value, "inline": inline}
         if self.result.get("fields") is None:
             self.result["fields"] = []
         self.result["fields"].append(field)
