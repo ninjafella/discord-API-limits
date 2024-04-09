@@ -6,7 +6,6 @@ Welcome to discord_limits' documentation!
    :caption: Contents:
 
    api
-   extras
 
 
 Basic usage

@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
+
 from aiohttp import ClientResponse
 
-import discord_limits
 from discord_limits.errors import *
+
+if TYPE_CHECKING:
+    from discord_limits import DiscordClient
 
 
 class InvitePaths:
@@ -10,14 +14,9 @@ class InvitePaths:
     ----------
     client : discord_limits.DiscordClient
         The DiscordClient instance to use.
-
-    Raises
-    ------
-    TypeError
-        'client' must be of type `discord_limits.DiscordClient`.
     """
 
-    def __init__(self, client: discord_limits.DiscordClient):
+    def __init__(self, client: 'DiscordClient'):
         self._client = client
 
     async def get_invite(
@@ -26,7 +25,7 @@ class InvitePaths:
         *,
         with_counts: bool = True,
         with_expiration: bool = True,
-        guild_scheduled_event_id: int = None,
+        guild_scheduled_event_id: int | None = None,
     ) -> ClientResponse:
         """Get an invite.
 
@@ -54,11 +53,13 @@ class InvitePaths:
         }
 
         if guild_scheduled_event_id:
-            params["guild_scheduled_event_id"] = guild_scheduled_event_id
+            params["guild_scheduled_event_id"] = guild_scheduled_event_id  # type: ignore
 
         return await self._client._request("GET", path, bucket, params=params)
 
-    async def delete_invite(self, invite_id: str, reason: str = None) -> ClientResponse:
+    async def delete_invite(
+        self, invite_id: str, reason: str | None = None
+    ) -> ClientResponse:
         """Delete an invite.
 
         Parameters

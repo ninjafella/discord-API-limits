@@ -21,7 +21,7 @@ class DiscordClient(Paths):
     retry_rate_limits : bool, optional
         Whether the client will sleep and retry after 429 errors, by default True
     api_version : int, optional
-        The Discord API version to use, by default 10
+        The Discord API version to use (6, 7, 8, 9, 10), by default 10
     """
 
     def __init__(
@@ -105,7 +105,7 @@ class DiscordClient(Paths):
         json: dict | None = None,
         params: dict | None = None,
         auth: bool = True,
-    ) -> ClientResponse: # type: ignore
+    ) -> ClientResponse:  # type: ignore
         if auth:
             if self.token_type is None:
                 raise InvalidParams(
@@ -172,7 +172,7 @@ class DiscordClient(Paths):
             retry_after = float(data.get("retry_after"))
             bucket_handler = self._get_bucket_handler(bucket)
             bucket_handler.retry_after = retry_after
-            
+
             raise TooManyRequests(f"{text}, bucket: {bucket}")
         elif status == 400:
             raise BadRequest(

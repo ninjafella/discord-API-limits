@@ -1,9 +1,11 @@
-from typing import Any, List, TypeVar
+from typing import TYPE_CHECKING, Any, List, TypeVar
 
 from aiohttp import ClientResponse
 
-import discord_limits
 from discord_limits.errors import *
+
+if TYPE_CHECKING:
+    from discord_limits import DiscordClient
 
 ISO8601_timestamp = TypeVar("ISO8601_timestamp", str, bytes)
 
@@ -14,14 +16,9 @@ class GuildPaths:
     ----------
     client : discord_limits.DiscordClient
         The DiscordClient instance to use.
-
-    Raises
-    ------
-    TypeError
-        'client' must be of type `discord_limits.DiscordClient`.
     """
 
-    def __init__(self, client: discord_limits.DiscordClient):
+    def __init__(self, client: 'DiscordClient'):
         self._client = client
 
     async def create_guild(
@@ -73,23 +70,23 @@ class GuildPaths:
             "name": name,
         }
         if verification_level is not None:
-            payload["verification_level"] = verification_level # type: ignore
+            payload["verification_level"] = verification_level  # type: ignore
         if default_message_notifications is not None:
-            payload["default_message_notifications"] = default_message_notifications # type: ignore
+            payload["default_message_notifications"] = default_message_notifications  # type: ignore
         if explicit_content_filter is not None:
-            payload["explicit_content_filter"] = explicit_content_filter # type: ignore
+            payload["explicit_content_filter"] = explicit_content_filter  # type: ignore
         if roles is not None:
-            payload["roles"] = roles # type: ignore
+            payload["roles"] = roles  # type: ignore
         if channels is not None:
-            payload["channels"] = channels # type: ignore
+            payload["channels"] = channels  # type: ignore
         if afk_channel_id is not None:
-            payload["afk_channel_id"] = afk_channel_id # type: ignore
+            payload["afk_channel_id"] = afk_channel_id  # type: ignore
         if afk_timeout is not None:
-            payload["afk_timeout"] = afk_timeout # type: ignore
+            payload["afk_timeout"] = afk_timeout  # type: ignore
         if system_channel_id is not None:
-            payload["system_channel_id"] = system_channel_id # type: ignore
+            payload["system_channel_id"] = system_channel_id  # type: ignore
         if system_channel_flags is not None:
-            payload["system_channel_flags"] = system_channel_flags # type: ignore
+            payload["system_channel_flags"] = system_channel_flags  # type: ignore
 
         return await self._client._request("POST", path, bucket, json=payload)
 
@@ -631,7 +628,11 @@ class GuildPaths:
         )
 
     async def get_bans(
-        self, guild_id: int, limit: int = 1000, before: int | None = None, after: int | None = None
+        self,
+        guild_id: int,
+        limit: int = 1000,
+        before: int | None = None,
+        after: int | None = None,
     ) -> ClientResponse:
         """Get a list of all bans in a guild.
 
@@ -947,7 +948,7 @@ class GuildPaths:
             "days": days,
         }
         if roles is not None:
-            params["include_roles"] = ", ".join(roles) #type: ignore
+            params["include_roles"] = ", ".join(roles)  # type: ignore
 
         return await self._client._request("GET", path, bucket, params=params)
 
@@ -995,7 +996,7 @@ class GuildPaths:
             "compute_prune_count": compute_prune_count,
         }
         if roles:
-            payload["include_roles"] = ", ".join(roles) #type: ignore
+            payload["include_roles"] = ", ".join(roles)  # type: ignore
 
         return await self._client._request(
             "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
@@ -1352,7 +1353,7 @@ class GuildPaths:
         if suppress is not None:
             payload["suppress"] = suppress
         if request_to_speak_timestamp is not None:
-            payload["request_to_speak_timestamp"] = request_to_speak_timestamp #type: ignore
+            payload["request_to_speak_timestamp"] = request_to_speak_timestamp  # type: ignore
         return await self._client._request("PATCH", path, bucket, json=payload)
 
     async def edit_users_voice_state(

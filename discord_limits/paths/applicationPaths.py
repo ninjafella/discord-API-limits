@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
+
 from aiohttp import ClientResponse
 
-import discord_limits
 from discord_limits.errors import *
+
+if TYPE_CHECKING:
+    from discord_limits import DiscordClient
 
 
 class ApplicationPaths:
@@ -10,18 +14,9 @@ class ApplicationPaths:
     ----------
     client : discord_limits.DiscordClient
         The DiscordClient instance to use.
-
-    Raises
-    ------
-    TypeError
-        'client' must be of type `discord_limits.DiscordClient`.
     """
 
-    def __init__(self, client: discord_limits.DiscordClient):
-        if not isinstance(client, discord_limits.DiscordClient):
-            raise TypeError(
-                '"client" must be an instance of discord_limits.DiscordClient'
-            )
+    def __init__(self, client: 'DiscordClient'):
         self._client = client
 
     # Application commands (global)

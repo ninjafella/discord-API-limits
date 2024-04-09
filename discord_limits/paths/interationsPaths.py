@@ -1,8 +1,11 @@
-from aiohttp import ClientResponse
-from typing import List, Any
+from typing import TYPE_CHECKING, Any, List
 
-import discord_limits
+from aiohttp import ClientResponse
+
 from discord_limits.errors import *
+
+if TYPE_CHECKING:
+    from discord_limits import DiscordClient
 
 
 class InteractionsPaths:
@@ -11,18 +14,17 @@ class InteractionsPaths:
     ----------
     client : discord_limits.DiscordClient
         The DiscordClient instance to use.
-
-    Raises
-    ------
-    TypeError
-        'client' must be of type `discord_limits.DiscordClient`.
     """
 
-    def __init__(self, client: discord_limits.DiscordClient):
+    def __init__(self, client: 'DiscordClient'):
         self._client = client
 
     async def create_interaction_response(
-        self, interaction_id: int, interaction_token: str, type: int, data: dict | None = None
+        self,
+        interaction_id: int,
+        interaction_token: str,
+        type: int,
+        data: dict | None = None,
     ) -> ClientResponse:
         """Create an interaction response.
 
@@ -46,7 +48,7 @@ class InteractionsPaths:
         bucket = "POST" + path
         payload = {"type": type}
         if data is not None:
-            payload["data"] = data #type: ignore
+            payload["data"] = data  # type: ignore
         return await self._client._request("POST", path, bucket, json=payload)
 
     async def get_original_interaction_response(

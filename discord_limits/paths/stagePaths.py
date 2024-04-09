@@ -1,8 +1,11 @@
-from aiohttp import ClientResponse
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import discord_limits
+from aiohttp import ClientResponse
+
 from discord_limits.errors import *
+
+if TYPE_CHECKING:
+    from discord_limits import DiscordClient
 
 
 class StagePaths:
@@ -11,14 +14,9 @@ class StagePaths:
     ----------
     client : discord_limits.DiscordClient
         The DiscordClient instance to use.
-
-    Raises
-    ------
-    TypeError
-        'client' must be of type `discord_limits.DiscordClient`.
     """
 
-    def __init__(self, client: discord_limits.DiscordClient):
+    def __init__(self, client: 'DiscordClient'):
         self._client = client
 
     async def create_stage_instance(

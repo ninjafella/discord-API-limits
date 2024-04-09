@@ -1,9 +1,11 @@
-from typing import Any, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar
 
 from aiohttp import ClientResponse
 
-import discord_limits
 from discord_limits.errors import *
+
+if TYPE_CHECKING:
+    from discord_limits import DiscordClient
 
 ISO8601_timestamp = TypeVar("ISO8601_timestamp", str, bytes)
 
@@ -14,14 +16,9 @@ class ChannelPaths:
     ----------
     client : discord_limits.DiscordClient
         The DiscordClient instance to use.
-
-    Raises
-    ------
-    TypeError
-        'client' must be of type `discord_limits.DiscordClient`.
     """
 
-    def __init__(self, client: discord_limits.DiscordClient):
+    def __init__(self, client: 'DiscordClient'):
         self._client = client
 
     async def get_channel(self, channel_id: int) -> ClientResponse:
@@ -773,7 +770,11 @@ class ChannelPaths:
         )
 
     async def add_group_recipient(
-        self, channel_id: int, user_id: int, access_token: str, nickname: str | None = None
+        self,
+        channel_id: int,
+        user_id: int,
+        access_token: str,
+        nickname: str | None = None,
     ) -> ClientResponse:
         """Adds a recipient to a Group DM using their access token.
 
@@ -966,7 +967,7 @@ class ChannelPaths:
             raise InvalidParams(
                 "auto_archive_duration must equal to 60, 1440, 4320 or 10080"
             )
-        elif 0 > rate_limit_per_user or rate_limit_per_user > 21600: # type: ignore
+        elif 0 > rate_limit_per_user or rate_limit_per_user > 21600:  # type: ignore
             raise InvalidParams("rate_limit_per_user must be between 0 and 21600")
         valid_message_keys = (
             "content",
