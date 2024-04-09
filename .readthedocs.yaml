@@ -23,4 +23,3 @@ sphinx:
 python:
   install:
     - requirements: requirements.txt
-    - package: "sphinx-autodoc2"
