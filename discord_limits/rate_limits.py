@@ -1,6 +1,5 @@
 import asyncio
-from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List
 
 from aiohttp import ClientResponse
@@ -10,12 +9,8 @@ from aiolimiter import AsyncLimiter
 class BucketHandler:
     """
     Handles bucket specific rate limits
-    flow:
-        dict {
-            bucket_name: BucketHandler
-        }
+    {bucket_name: BucketHandler}
     """
-
     limit: int | None = None
     remaining: int | None = None
     reset: datetime | None = None

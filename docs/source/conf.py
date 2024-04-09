@@ -12,8 +12,8 @@
 import os
 import sys
 
-# sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, os.path.abspath('..'))
+#sys.path.insert(0, os.path.abspath("../.."))
 
 
 # -- Project information -----------------------------------------------------
@@ -37,7 +37,7 @@ release = "1.1.2"
 #autodoc_typehints = "none"
 
 extensions = ["autodoc2", "sphinx.ext.napoleon"]
-autodoc2_packages = ["../discord_limits"]
+autodoc2_packages = ["../../discord_limits"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
