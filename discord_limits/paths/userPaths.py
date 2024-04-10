@@ -7,6 +7,7 @@ from discord_limits.errors import *
 if TYPE_CHECKING:
     from discord_limits import DiscordClient
 
+
 class UserPaths:
     """
     Parameters
@@ -15,7 +16,7 @@ class UserPaths:
         The DiscordClient instance to use.
     """
 
-    def __init__(self, client: 'DiscordClient'):
+    def __init__(self, client: "DiscordClient"):
         self._client = client
 
     async def get_current_user(self) -> ClientResponse:

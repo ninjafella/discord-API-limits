@@ -12,8 +12,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
-#sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, os.path.abspath("../../"))
 
 
 # -- Project information -----------------------------------------------------
@@ -32,12 +31,10 @@ release = "1.1.2"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-#extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
-#autodoc_member_order = "bysource"
-#autodoc_typehints = "none"
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
+autodoc_member_order = "bysource"
+autodoc_typehints = "none"
 
-extensions = ["autodoc2", "sphinx.ext.napoleon"]
-autodoc2_packages = ["../../discord_limits"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

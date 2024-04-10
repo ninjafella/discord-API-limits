@@ -11,6 +11,7 @@ class BucketHandler:
     Handles bucket specific rate limits
     {bucket_name: BucketHandler}
     """
+
     limit: int | None = None
     remaining: int | None = None
     reset: datetime | None = None
@@ -44,18 +45,18 @@ class BucketHandler:
             setattr(self, k, v)
 
     async def __aenter__(self):
-        self.cond = self.cond or asyncio.Condition(loop=asyncio.get_running_loop()) # type: ignore
+        self.cond = self.cond or asyncio.Condition(loop=asyncio.get_running_loop())  # type: ignore
         if self.prevent_429 is True:
             await self.cond.acquire()
             if self.remaining is not None and self.remaining == 0:
                 now = datetime.utcnow()
-                to_wait = (self.reset - now).total_seconds() + 1 # type: ignore
+                to_wait = (self.reset - now).total_seconds() + 1  # type: ignore
                 await asyncio.sleep(to_wait)
         return self
 
     async def __aexit__(self, *args):
         if self.prevent_429 is True:
-            self.cond.release() # type: ignore
+            self.cond.release()  # type: ignore
 
 
 class AsyncNonLimiter:

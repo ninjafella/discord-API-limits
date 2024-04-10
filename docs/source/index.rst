@@ -2,9 +2,9 @@ Welcome to discord_limits' documentation!
 =========================================
 
 .. toctree::
-   :caption: Contents:
+   :maxdepth: 3
 
-   client
+   API<api.rst>
 
 
 Basic usage

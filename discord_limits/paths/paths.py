@@ -17,21 +17,55 @@ from .webhookPaths import WebhookPaths
 
 
 class Paths:
+    """A class representing various paths related to different entities.
+
+    Parameters
+    ----------
+    client : DiscordClient
+        The client to use for the paths.
+
+    Attributes
+    ----------
+    application : ApplicationPaths
+        The application paths.
+    audit_logs : AuditPaths
+        The audit log paths.
+    auto_moderation : AutoModerationPaths
+        The auto moderation paths.
+    channel : ChannelPaths
+        The channel paths.
+    emoji : EmojiPaths
+        The emoji paths.
+    guild : GuildPaths
+        The guild paths.
+    interactions : InteractionsPaths
+        The interactions paths.
+    invite : InvitePaths
+        The invite paths.
+    stage : StagePaths
+        The stage paths.
+    sticker : StickerPaths
+        The sticker paths.
+    user : UserPaths
+        The users paths.
+    webhook : WebhookPaths
+        The webhook paths.
+    """  
 
     def __init__(self, client):
         self._client = client
-        self.application = ApplicationPaths(self._client)
-        self.audit_logs = AuditPaths(self._client)
-        self.auto_moderation = AutoModerationPaths(self._client)
-        self.channel = ChannelPaths(self._client)
-        self.emoji = EmojiPaths(self._client)
-        self.guild = GuildPaths(self._client)
-        self.interactions = InteractionsPaths(self._client)
-        self.invite = InvitePaths(self._client)
-        self.stage = StagePaths(self._client)
-        self.sticker = StickerPaths(self._client)
-        self.user = UserPaths(self._client)
-        self.webhook = WebhookPaths(self._client)
+        self.application: ApplicationPaths = ApplicationPaths(self._client) #: ApplicationPaths: The application paths.
+        self.audit_logs: AuditPaths = AuditPaths(self._client) #: AuditPaths: The audit log paths.
+        self.auto_moderation: AutoModerationPaths = AutoModerationPaths(self._client) #: AutoModerationPaths: The auto moderation paths
+        self.channel: ChannelPaths = ChannelPaths(self._client) #: ChannelPaths: The channel paths.
+        self.emoji: EmojiPaths = EmojiPaths(self._client) #: EmojiPaths: The emoji paths.
+        self.guild: GuildPaths = GuildPaths(self._client) #: GuildPaths: The guild paths.
+        self.interactions: InteractionsPaths = InteractionsPaths(self._client) #: InteractionsPaths: The interactions paths
+        self.invite: InvitePaths = InvitePaths(self._client) #: InvitePaths: The invite paths.
+        self.stage: StagePaths = StagePaths(self._client) #: StagePaths: The stage paths.
+        self.sticker: StickerPaths = StickerPaths(self._client) #: StickerPaths: The sticker paths.
+        self.user: UserPaths = UserPaths(self._client) #: UserPaths: The users paths.
+        self.webhook: WebhookPaths = WebhookPaths(self._client) #: WebhookPaths: The webhook paths.
 
     async def list_voice_regions(self) -> ClientResponse:
         """Get a list of voice regions.

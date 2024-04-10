@@ -16,7 +16,7 @@ class InteractionsPaths:
         The DiscordClient instance to use.
     """
 
-    def __init__(self, client: 'DiscordClient'):
+    def __init__(self, client: "DiscordClient"):
         self._client = client
 
     async def create_interaction_response(

@@ -16,7 +16,7 @@ class ApplicationPaths:
         The DiscordClient instance to use.
     """
 
-    def __init__(self, client: 'DiscordClient'):
+    def __init__(self, client: "DiscordClient"):
         self._client = client
 
     # Application commands (global)
