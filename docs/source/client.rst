@@ -1,5 +1,5 @@
-API
-===
+Client
+======
 
 .. currentmodule:: discord_limits
 

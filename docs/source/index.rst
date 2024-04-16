@@ -4,7 +4,7 @@ Welcome to discord_limits' documentation!
 .. toctree::
    :maxdepth: 3
 
-   API<api.rst>
+   Client<client.rst>
 
 
 Basic usage

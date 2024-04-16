@@ -1,14 +1,14 @@
 import asyncio
 import warnings
+from sys import version_info as python_version
 
 from aiohttp import ClientResponse, ClientSession
 from aiohttp import __version__ as aiohttp_version
-from sys import version_info as python_version
 
+from . import __version__
 from .errors import *
 from .paths import Paths
 from .rate_limits import BucketHandler, ClientRateLimits
-from . import __version__
 
 
 class DiscordClient(Paths):
@@ -95,14 +95,6 @@ class DiscordClient(Paths):
         else:
             self.token = None
 
-    def _get_bucket_handler(self, bucket: str):
-        bucket_handler = self.rate_limits.buckets.get(bucket)
-        if bucket_handler is None:
-            bucket_handler = self.rate_limits.buckets[bucket] = BucketHandler(
-                bucket=bucket
-            )
-        return bucket_handler
-
     async def _request(
         self,
         method: str,
@@ -113,6 +105,7 @@ class DiscordClient(Paths):
         params: dict | None = None,
         auth: bool = True,
     ) -> ClientResponse:  # type: ignore
+
         if auth:
             if self.token_type is None:
                 raise InvalidParams(
@@ -120,90 +113,3 @@ class DiscordClient(Paths):
                 )
             headers["Authorization"] = self.token
         cs = ClientSession()
-
-        url = self._base_url + path
-
-        request_manager = cs.request(
-            method, url, json=json, params=params, headers=headers
-        )
-
-        bucket_handler = self._get_bucket_handler(bucket)
-        bucket_handler.prevent_429 = self._prevent_rate_limits
-        async with self.rate_limits.global_limiter:
-            async with bucket_handler as bh:
-                async with cs:
-                    r = await request_manager
-                    bh.check_limit_headers(
-                        r
-                    )  # sets up the bucket rate limit attributes w/ response headers
-                try:
-                    if await self._check_response(response=r, bucket=bucket):
-                        return r
-                except TooManyRequests as e:
-                    if self._retry_rate_limits is True:
-                        response_data = await r.json()
-                        timeout = response_data["retry_after"] + 1
-                        await asyncio.sleep(timeout)
-                        # reschedule same request
-                        return await self._request(
-                            method,
-                            path,
-                            bucket,
-                            headers=headers,
-                            json=json,
-                            params=params,
-                            auth=auth,
-                        )
-                    else:
-                        raise e
-                except NotFound as e:
-                    raise e
-                except UnknownError as e:
-                    raise e
-
-    async def _check_response(self, response: ClientResponse, bucket: str):
-        """Checks API response for errors. Returns True only on 300 > status >= 200"""
-        status = response.status
-        reason = response.reason
-
-        if 300 > status >= 200:
-            return True
-        elif status == 429:
-            data = await response.json()
-            message = data["message"]
-            if "global" in data:
-                text = f"Global rate limit. {data['message']}"
-            else:
-                text = f"{message}"
-
-            retry_after = float(data.get("retry_after"))
-            bucket_handler = self._get_bucket_handler(bucket)
-            bucket_handler.retry_after = retry_after
-
-            raise TooManyRequests(f"{text}, bucket: {bucket}")
-        elif status == 400:
-            raise BadRequest(
-                f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}'
-            )
-        elif status == 401:
-            raise Unauthorized(
-                f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}'
-            )
-        elif status == 403:
-            raise Forbidden(
-                f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}'
-            )
-        elif status == 404:
-            raise NotFound(
-                f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}'
-            )
-        elif status == 500:
-            raise InternalServerError(
-                f'Error Code: "{status}" Reason: "{reason}", bucket {bucket}'
-            )
-        else:
-            error_text = f'Error code: "{status}" Reason: "{reason}"'
-            if status in api_errors:
-                raise api_errors[status](error_text)
-            else:
-                raise UnknownError(error_text)
