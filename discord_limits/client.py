@@ -109,7 +109,7 @@ class DiscordClient(Paths):
         if auth:
             if self.token_type is None:
                 raise InvalidParams(
-                    "No token has been set. Please set the auth parameter to False or set a token with set_new_token()."
+                    "No token has been set. Please set a token with set_new_token()."
                 )
             headers["Authorization"] = self.token
         cs = ClientSession()
