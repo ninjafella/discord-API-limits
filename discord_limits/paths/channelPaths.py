@@ -474,7 +474,7 @@ class ChannelPaths:
         # Special case certain sub-rate limits
         # https://github.com/discord/discord-api-docs/issues/1092
         # https://github.com/discord/discord-api-docs/issues/1295
-        difference = datetime.datetime.now(datetime.UTC) - helpers.snowflake_time(
+        difference = datetime.datetime.now(datetime.timezone.utc) - helpers.snowflake_time(
             int(message_id)
         )
         metadata = None
