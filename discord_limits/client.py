@@ -87,8 +87,8 @@ class DiscordClient(Paths):
 
         self.global_limiter = AsyncLimiter(50, 1)
 
-        self.suppress_warnings = suppress_warnings  #: bool: Whether to suppress warnings or not. Default is False.
-        self.max_attempts = max_attempts  #: int: The maximum number of attempts to make a request. Default is 3.
+        self.suppress_warnings = suppress_warnings
+        self.max_attempts = max_attempts
 
     def _create_bucket_handler(self, r: ClientResponse, bucket_path: str):
         status = r.status
@@ -217,7 +217,8 @@ class DiscordClient(Paths):
                 bh.remaining = int(headers["X-RateLimit-Remaining"])
             elif header == "X-RateLimit-Reset":
                 bh.reset = datetime.datetime.fromtimestamp(
-                    float(headers["X-RateLimit-Reset"]), datetime.UTC
+                    float(headers["X-RateLimit-Reset"]),
+                    datetime.timezone.utc,
                 )
             elif header == "X-RateLimit-Bucket" and header != bh.bucket_hash:
                 if bh.bucket_hash == "":

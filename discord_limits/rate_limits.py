@@ -29,7 +29,7 @@ class BucketHandler:
     async def __aenter__(self):
         await self.lock.wait()
         if self.remaining is not None and self.remaining == 0:
-            now = datetime.datetime.now(datetime.UTC)
+            now = datetime.datetime.now(datetime.timezone.utc)
             to_wait = (self.reset - now).total_seconds() + 1  # type: ignore
             await asyncio.sleep(to_wait)
         return self
