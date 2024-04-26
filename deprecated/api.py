@@ -96,7 +96,7 @@ class DiscordClient(Paths):
             self.token = None
 
     def _get_bucket_handler(self, bucket: str):
-        bucket_handler = self.rate_limits.buckets.get(bucket)
+        bucket_handler = self.rate_limits.bucket.get(bucket)
         if bucket_handler is None:
             bucket_handler = self.rate_limits.buckets[bucket] = BucketHandler(
                 bucket=bucket
@@ -138,7 +138,7 @@ class DiscordClient(Paths):
                     )  # sets up the bucket rate limit attributes w/ response headers
                 try:
                     if await self._check_response(response=r, bucket=bucket):
-                        return r
+                        return r   
                 except TooManyRequests as e:
                     if self._retry_rate_limits is True:
                         response_data = await r.json()

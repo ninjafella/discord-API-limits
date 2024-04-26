@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from aiohttp import ClientResponse
 
@@ -28,8 +28,7 @@ class UserPaths:
             A user object.
         """
         path = "/users/@me"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_user(self, user_id: int) -> ClientResponse:
         """Get a user.
@@ -45,8 +44,7 @@ class UserPaths:
             A user object.
         """
         path = f"/users/{user_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_current_user(self, username: str) -> ClientResponse:
         """Edit the current user.
@@ -62,12 +60,14 @@ class UserPaths:
             A user object.
         """
         path = "/users/@me"
-        bucket = "PATCH" + path
         payload = {"username": username}
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def get_current_user_guilds(
-        self, limit: int = 200, before: int | None = None, after: int | None = None
+        self,
+        limit: int = 200,
+        before: Optional[int] = None,
+        after: Optional[int] = None,
     ) -> ClientResponse:
         """Get the current user's guilds.
 
@@ -91,7 +91,6 @@ class UserPaths:
             If the limit is not between 1 and 200.
         """
         path = "/users/@me/guilds"
-        bucket = "GET" + path
         if 1 > limit or limit > 200:
             raise InvalidParams("limit must be between 1 and 200")
 
@@ -104,7 +103,7 @@ class UserPaths:
         if after is not None:
             params["after"] = after
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def get_current_user_guild_member(self, guild_id: int) -> ClientResponse:
         """Get the current user's guild member.
@@ -120,8 +119,7 @@ class UserPaths:
             A guild member object.
         """
         path = f"/users/@me/guilds/{guild_id}/member"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def leave_guild(self, guild_id: int) -> ClientResponse:
         """Leave a guild.
@@ -137,8 +135,7 @@ class UserPaths:
             The response from Discord.
         """
         path = f"/users/@me/guilds/{guild_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def create_DM(self, recipient_id: int) -> ClientResponse:
         """Open a DM.
@@ -157,12 +154,11 @@ class UserPaths:
             "recipient_id": recipient_id,
         }
         path = f"/users/@me/channels"
-        bucket = "POST" + path
 
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def create_group_DM(
-        self, access_tokens: List[str], nicks: dict[int, str] | None = None
+        self, access_tokens: List[str], nicks: Optional[dict[int, str]] = None
     ) -> ClientResponse:
         """Open a group DM.
 
@@ -182,9 +178,8 @@ class UserPaths:
             "access_tokens": access_tokens,
         }
         path = f"/users/@me/channels"
-        bucket = "POST" + path
 
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def get_connections(self) -> ClientResponse:
         """Get the current user's connections.
@@ -195,5 +190,4 @@ class UserPaths:
             A list of connection objects.
         """
         path = "/users/@me/connections"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)

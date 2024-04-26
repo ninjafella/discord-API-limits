@@ -51,7 +51,6 @@ class AuditPaths:
             raise InvalidParams("limit must be between 1 and 100")
 
         path = f"/guilds/{guild_id}/audit-logs"
-        bucket = "GET" + path
 
         params = {"limit": limit}
         if before is not None:
@@ -61,4 +60,4 @@ class AuditPaths:
         if action_type is not None:
             params["action_type"] = action_type
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)

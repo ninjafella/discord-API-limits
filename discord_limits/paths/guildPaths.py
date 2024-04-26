@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, List, TypeVar
+from typing import TYPE_CHECKING, Any, List, TypeVar, Optional
 
 from aiohttp import ClientResponse
 
@@ -24,15 +24,15 @@ class GuildPaths:
     async def create_guild(
         self,
         name: str,
-        verification_level: int | None = None,
-        default_message_notifications: int | None = None,
-        explicit_content_filter: int | None = None,
-        roles: List[Any] | None = None,
-        channels: List[Any] | None = None,
-        afk_channel_id: int | None = None,
-        afk_timeout: int | None = None,
-        system_channel_id: int | None = None,
-        system_channel_flags: int | None = None,
+        verification_level: Optional[int] = None,
+        default_message_notifications: Optional[int] = None,
+        explicit_content_filter: Optional[int] = None,
+        roles: Optional[List[Any]] = None,
+        channels: Optional[List[Any]] = None,
+        afk_channel_id: Optional[int] = None,
+        afk_timeout: Optional[int] = None,
+        system_channel_id: Optional[int] = None,
+        system_channel_flags: Optional[int] = None,
     ) -> ClientResponse:
         """Create a new guild.
 
@@ -65,7 +65,6 @@ class GuildPaths:
             A guild object.
         """
         path = "/guilds"
-        bucket = "POST" + path
         payload = {
             "name": name,
         }
@@ -88,7 +87,7 @@ class GuildPaths:
         if system_channel_flags is not None:
             payload["system_channel_flags"] = system_channel_flags  # type: ignore
 
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def get_guild(
         self, guild_id: int, with_counts: bool = True
@@ -108,9 +107,8 @@ class GuildPaths:
             A guild object.
         """
         path = f"/guilds/{guild_id}"
-        bucket = "GET" + path
         params = {"with_counts": with_counts}
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def get_guild_preview(self, guild_id: int) -> ClientResponse:
         """Get a guild preview by ID.
@@ -126,11 +124,10 @@ class GuildPaths:
             A guild preview object.
         """
         path = f"/guilds/{guild_id}/preview"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_guild(
-        self, guild_id: int, reason: str | None = None, **options: Any
+        self, guild_id: int, reason: Optional[str] = None, **options: Any
     ) -> ClientResponse:
         """Edit a guild.
 
@@ -149,7 +146,6 @@ class GuildPaths:
             A guild object.
         """
         path = f"/guilds/{guild_id}"
-        bucket = "PATCH" + path
 
         payload = {}
 
@@ -176,7 +172,7 @@ class GuildPaths:
         )
 
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_guild(self, guild_id: int) -> ClientResponse:
@@ -193,8 +189,7 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def get_guild_channels(self, guild_id: int) -> ClientResponse:
         """Get a guild's channels.
@@ -210,11 +205,10 @@ class GuildPaths:
             A list of guild channel objects.
         """
         path = f"/guilds/{guild_id}/channels"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_channel(
-        self, guild_id: int, name: str, *, reason: str | None = None, **options: Any
+        self, guild_id: int, name: str, *, reason: Optional[str] = None, **options: Any
     ) -> ClientResponse:
         """Create a channel in a guild.
 
@@ -235,7 +229,6 @@ class GuildPaths:
             A channel object.
         """
         path = f"/guilds/{guild_id}/channels"
-        bucket = "POST" + path
 
         payload = {
             "name": name,
@@ -258,7 +251,7 @@ class GuildPaths:
         )
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def edit_channel_position(
@@ -268,7 +261,7 @@ class GuildPaths:
         position: int,
         sync_permissions: bool,
         parent_id: int,
-        reason: str | None = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Edit a channel's position in the channel list.
 
@@ -293,7 +286,6 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/channels"
-        bucket = "PATCH" + path
 
         payload = {
             "id": channel_id,
@@ -303,7 +295,7 @@ class GuildPaths:
         }
 
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_active_threads(self, guild_id: int) -> ClientResponse:
@@ -320,8 +312,7 @@ class GuildPaths:
             A list of threads and members.
         """
         path = f"/guilds/{guild_id}/threads/active"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_member(self, guild_id: int, member_id: int) -> ClientResponse:
         """Get a member in a guild.
@@ -339,11 +330,10 @@ class GuildPaths:
             A guild member object.
         """
         path = f"/guilds/{guild_id}/members/{member_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_members(
-        self, guild_id: int, limit: int = 1, after: int | None = None
+        self, guild_id: int, limit: int = 1, after: Optional[int] = None
     ) -> ClientResponse:
         """Get a list of members in a guild.
 
@@ -370,7 +360,6 @@ class GuildPaths:
             raise InvalidParams("limit must be between 1 and 1000")
 
         path = f"/guilds/{guild_id}/members"
-        bucket = "GET" + path
 
         params = {
             "limit": limit,
@@ -378,7 +367,7 @@ class GuildPaths:
         if after is not None:
             params["after"] = after
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def search_guild_members(
         self, guild_id: int, query: str, limit: int = 1
@@ -408,21 +397,20 @@ class GuildPaths:
             raise InvalidParams("limit must be between 1 and 1000")
 
         path = f"/guilds/{guild_id}/members/search"
-        bucket = "GET" + path
 
         params = {
             "limit": limit,
             "query": query,
         }
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def add_guild_member(
         self,
         guild_id: int,
         user_id: int,
         access_token: str,
-        nick: str | None = None,
-        roles: List[int] | None = None,
+        nick: Optional[str] = None,
+        roles: Optional[List[int]] = None,
         mute: bool = False,
         deaf: bool = False,
     ) -> ClientResponse:
@@ -451,7 +439,6 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/members/{user_id}"
-        bucket = "PUT" + path
 
         payload = {"access_token": access_token, "mute": mute, "deaf": deaf}
 
@@ -460,19 +447,19 @@ class GuildPaths:
         if roles is not None:
             payload["roles"] = roles
 
-        return await self._client._request("PUT", path, bucket, json=payload)
+        return await self._client._request("PUT", path, json=payload)
 
     async def modify_guild_member(
         self,
         user_id: int,
         guild_id: int,
-        nick: str | None = None,
-        roles: List[int] | None = None,
-        mute: bool | None = None,
-        deafen: bool | None = None,
-        channel_id: int | None = None,
-        timeout: ISO8601_timestamp | None = None,
-        reason: str | None = None,
+        nick: Optional[str] = None,
+        roles: Optional[List[int]] = None,
+        mute: Optional[bool] = None,
+        deafen: Optional[bool] = None,
+        channel_id: Optional[int] = None,
+        timeout: Optional[ISO8601_timestamp] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Modify a member in a guild.
 
@@ -503,7 +490,6 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/members/{user_id}"
-        bucket = "PATCH" + path
         payload = {}
         if nick is not None:
             payload["nick"] = nick
@@ -519,11 +505,11 @@ class GuildPaths:
             payload["timeout"] = timeout
 
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def modify_current_member(
-        self, guild_id: int, nick: str, reason: str | None = None
+        self, guild_id: int, nick: str, reason: Optional[str] = None
     ) -> ClientResponse:
         """Modify the current user in a guild.
 
@@ -542,14 +528,13 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/members/@me"
-        bucket = "PATCH" + path
         payload = {"nick": nick}
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def add_role(
-        self, guild_id: int, user_id: int, role_id: int, reason: str | None = None
+        self, guild_id: int, user_id: int, role_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Add a role to a member in a guild.
 
@@ -570,13 +555,12 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}"
-        bucket = "PUT" + path
         return await self._client._request(
-            "PUT", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "PUT", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def remove_role(
-        self, guild_id: int, user_id: int, role_id: int, reason: str | None = None
+        self, guild_id: int, user_id: int, role_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Remove a role from a member in a guild.
 
@@ -597,13 +581,12 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def kick(
-        self, user_id: int, guild_id: int, reason: str | None = None
+        self, user_id: int, guild_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Kick a member from a guild.
 
@@ -622,17 +605,16 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/members/{user_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_bans(
         self,
         guild_id: int,
         limit: int = 1000,
-        before: int | None = None,
-        after: int | None = None,
+        before: Optional[int] = None,
+        after: Optional[int] = None,
     ) -> ClientResponse:
         """Get a list of all bans in a guild.
 
@@ -653,7 +635,6 @@ class GuildPaths:
             A list of ban objects.
         """
         path = f"/guilds/{guild_id}/bans"
-        bucket = "GET" + path
         params = {
             "limit": limit,
         }
@@ -662,7 +643,7 @@ class GuildPaths:
         if after is not None:
             params["after"] = after
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def get_ban(self, user_id: int, guild_id: int) -> ClientResponse:
         """Get a ban from a guild.
@@ -680,15 +661,14 @@ class GuildPaths:
             A ban object.
         """
         path = f"/guilds/{guild_id}/bans/{user_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def ban(
         self,
         user_id: int,
         guild_id: int,
         delete_message_days: int = 0,
-        reason: str | None = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Ban a user from a guild.
 
@@ -717,18 +697,17 @@ class GuildPaths:
             raise InvalidParams("limit must be between 0 and 7")
 
         path = f"/guilds/{guild_id}/bans/{user_id}"
-        bucket = "PUT" + path
 
         params = {
             "delete_message_days": delete_message_days,
         }
 
         return await self._client._request(
-            "PUT", path, bucket, params=params, headers={"X-Audit-Log-Reason": reason}
+            "PUT", path, params=params, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def unban(
-        self, user_id: int, guild_id: int, *, reason: str | None = None
+        self, user_id: int, guild_id: int, *, reason: Optional[str] = None
     ) -> ClientResponse:
         """Unban a user from a guild.
 
@@ -747,9 +726,8 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/bans/{user_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_roles(self, guild_id: int) -> ClientResponse:
@@ -766,19 +744,18 @@ class GuildPaths:
             A list of role objects.
         """
         path = f"/guilds/{guild_id}/roles"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_role(
         self,
         guild_id: int,
-        name: str | None = None,
-        permissions: str | None = None,
-        colour: int | None = None,
-        hoist: bool | None = None,
-        unicode_emoji: str | None = None,
-        mentionable: bool | None = None,
-        reason: str | None = None,
+        name: Optional[str] = None,
+        permissions: Optional[str] = None,
+        colour: Optional[int] = None,
+        hoist: Optional[bool] = None,
+        unicode_emoji: Optional[str] = None,
+        mentionable: Optional[bool] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Create a role in a guild.
 
@@ -807,7 +784,6 @@ class GuildPaths:
             A role object.
         """
         path = f"/guilds/{guild_id}/roles"
-        bucket = "POST" + path
         payload = {}
         if name is not None:
             payload["name"] = name
@@ -822,11 +798,11 @@ class GuildPaths:
         if mentionable is not None:
             payload["mentionable"] = mentionable
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def move_role_position(
-        self, guild_id: int, role_id: int, position: int, reason: str | None = None
+        self, guild_id: int, role_id: int, position: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Move a role's position in a guild.
 
@@ -847,14 +823,13 @@ class GuildPaths:
             A list of role objects.
         """
         path = f"/guilds/{guild_id}/roles"
-        bucket = "PATCH" + path
         payload = {"id": role_id, "position": position}
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def edit_role(
-        self, guild_id: int, role_id: int, reason: str | None = None, **fields: Any
+        self, guild_id: int, role_id: int, reason: Optional[str] = None, **fields: Any
     ) -> ClientResponse:
         """Edit a role in a guild.
 
@@ -875,7 +850,6 @@ class GuildPaths:
             A role object.
         """
         path = f"/guilds/{guild_id}/roles/{role_id}"
-        bucket = "PATCH" + path
         valid_keys = (
             "name",
             "permissions",
@@ -886,11 +860,11 @@ class GuildPaths:
         )
         payload = {k: v for k, v in fields.items() if k in valid_keys}
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_role(
-        self, guild_id: int, role_id: int, reason: str | None = None
+        self, guild_id: int, role_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a role from a guild.
 
@@ -909,13 +883,12 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/roles/{role_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def estimate_pruned_members(
-        self, guild_id: int, days: int = 7, roles: str | None = None
+        self, guild_id: int, days: int = 7, roles: Optional[str] = None
     ) -> ClientResponse:
         """Get the number of members that would be removed from a guild if prune was run.
 
@@ -942,7 +915,6 @@ class GuildPaths:
             raise InvalidParams("days must be between 1 and 30")
 
         path = f"/guilds/{guild_id}/prune"
-        bucket = "GET" + path
 
         params = {
             "days": days,
@@ -950,15 +922,15 @@ class GuildPaths:
         if roles is not None:
             params["include_roles"] = ", ".join(roles)  # type: ignore
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def prune_members(
         self,
         guild_id: int,
         days: int = 7,
         compute_prune_count: bool = False,
-        roles: List[int] | None = None,
-        reason: str | None = None,
+        roles: Optional[List[int]] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Prune members from a guild.
 
@@ -989,7 +961,6 @@ class GuildPaths:
             raise InvalidParams("days must be between 1 and 30")
 
         path = f"/guilds/{guild_id}/prune"
-        bucket = "POST" + path
 
         payload = {
             "days": days,
@@ -999,7 +970,7 @@ class GuildPaths:
             payload["include_roles"] = ", ".join(roles)  # type: ignore
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_voice_regions(self, guild_id: int) -> ClientResponse:
@@ -1016,8 +987,7 @@ class GuildPaths:
             A list of voice region objects.
         """
         path = f"/guilds/{guild_id}/regions"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_guild_invites(self, guild_id: int) -> ClientResponse:
         """Get the invites for a guild.
@@ -1033,8 +1003,7 @@ class GuildPaths:
             A list of invite objects.
         """
         path = f"/guilds/{guild_id}/invites"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_guild_integrations(self, guild_id: int) -> ClientResponse:
         """Get the integrations for a guild.
@@ -1050,8 +1019,7 @@ class GuildPaths:
             A list of integration objects.
         """
         path = f"/guilds/{guild_id}/integrations"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_integration(
         self, guild_id: int, type: Any, id: Any
@@ -1073,14 +1041,13 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/integrations"
-        bucket = "POST" + path
 
         payload = {
             "type": type,
             "id": id,
         }
 
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def edit_integration(
         self, guild_id: int, integration_id: int, **payload: Any
@@ -1102,9 +1069,8 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/integrations/{integration_id}"
-        bucket = "PATCH" + path
 
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def sync_integration(
         self, guild_id: int, integration_id: int
@@ -1124,12 +1090,11 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/integrations/{integration_id}/sync"
-        bucket = "POST" + path
 
-        return await self._client._request("POST", path, bucket)
+        return await self._client._request("POST", path)
 
     async def delete_guild_integration(
-        self, guild_id: int, integration_id: int, *, reason: str | None = None
+        self, guild_id: int, integration_id: int, *, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete an integration for a guild.
 
@@ -1148,10 +1113,9 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/integrations/{integration_id}"
-        bucket = "DELETE" + path
 
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_guild_widget_settings(self, guild_id: int) -> ClientResponse:
@@ -1168,11 +1132,10 @@ class GuildPaths:
             A guild widget settings object.
         """
         path = f"/guilds/{guild_id}/widget"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_widget(
-        self, guild_id: int, enabled, channel_id: int, reason: str | None = None
+        self, guild_id: int, enabled, channel_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Edit the widget settings for a guild.
 
@@ -1193,13 +1156,12 @@ class GuildPaths:
             A guild widget settings object.
         """
         path = f"/guilds/{guild_id}/widget"
-        bucket = "PATCH" + path
         payload = {
             "enabled": enabled,
             "channel_id": channel_id,
         }
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_guild_widget(self, guild_id: int) -> ClientResponse:
@@ -1216,8 +1178,7 @@ class GuildPaths:
             A guild widget object.
         """
         path = f"/guilds/{guild_id}/widget.json"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_vanity_code(self, guild_id: int) -> ClientResponse:
         """Get the vanity URL for a guild.
@@ -1233,11 +1194,10 @@ class GuildPaths:
             A partial invite object.
         """
         path = f"/guilds/{guild_id}/vanity-url"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def change_vanity_code(
-        self, guild_id: int, code, reason: str | None = None
+        self, guild_id: int, code, reason: Optional[str] = None
     ) -> ClientResponse:
         """Change the vanity URL for a guild.
 
@@ -1256,10 +1216,9 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/vanity-url"
-        bucket = "PATCH" + path
         payload = {"code": code}
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_guild_welcome_screen(self, guild_id: int) -> ClientResponse:
@@ -1276,16 +1235,15 @@ class GuildPaths:
             A welcome screen object.
         """
         path = f"/guilds/{guild_id}/welcome-screen"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_guild_welcome_screen(
         self,
         guild_id: int,
-        enabled: bool | None = None,
-        welcome_channels: List[Any] | None = None,
-        description: str | None = None,
-        reason: str | None = None,
+        enabled: Optional[bool] = None,
+        welcome_channels: Optional[List[Any]] = None,
+        description: Optional[str] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Edit the welcome screen for a guild.
 
@@ -1308,7 +1266,6 @@ class GuildPaths:
             A welcome screen object.
         """
         path = f"/guilds/{guild_id}/welcome-screen"
-        bucket = "PATCH" + path
 
         payload = {
             "enabled": enabled,
@@ -1317,15 +1274,15 @@ class GuildPaths:
         }
 
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def edit_voice_state(
         self,
         guild_id: int,
         channel_id: int,
-        suppress: bool | None = None,
-        request_to_speak_timestamp: ISO8601_timestamp | None = None,
+        suppress: Optional[bool] = None,
+        request_to_speak_timestamp: Optional[ISO8601_timestamp] = None,
     ) -> ClientResponse:
         """Edit the voice state for a user.
 
@@ -1346,7 +1303,6 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/voice-states/@me"
-        bucket = "PATCH" + path
         payload = {
             "channel_id": channel_id,
         }
@@ -1354,10 +1310,14 @@ class GuildPaths:
             payload["suppress"] = suppress
         if request_to_speak_timestamp is not None:
             payload["request_to_speak_timestamp"] = request_to_speak_timestamp  # type: ignore
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def edit_users_voice_state(
-        self, guild_id: int, user_id: int, channel_id: int, suppress: bool | None = None
+        self,
+        guild_id: int,
+        user_id: int,
+        channel_id: int,
+        suppress: Optional[bool] = None,
     ) -> ClientResponse:
         """Edit the voice state for a user.
 
@@ -1378,13 +1338,12 @@ class GuildPaths:
             _description_
         """
         path = f"/guilds/{guild_id}/voice-states/{user_id}"
-        bucket = "PATCH" + path
         payload = {
             "channel_id": channel_id,
         }
         if suppress is not None:
             payload["suppress"] = suppress
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     """
     Guild Scheduled Event
@@ -1408,12 +1367,11 @@ class GuildPaths:
             A list of guild scheduled event objects.
         """
         path = f"/guilds/{guild_id}/scheduled-events"
-        bucket = "GET" + path
         params = {"with_user_count": with_user_count}
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def create_guild_scheduled_event(
-        self, guild_id: int, reason: str | None = None, **payload: Any
+        self, guild_id: int, reason: Optional[str] = None, **payload: Any
     ) -> ClientResponse:
         """Create a scheduled event for a guild.
 
@@ -1432,7 +1390,6 @@ class GuildPaths:
             A guild scheduled event object.
         """
         path = f"/guilds/{guild_id}/scheduled-events"
-        bucket = "POST" + path
         valid_keys = (
             "channel_id",
             "entity_metadata",
@@ -1447,7 +1404,7 @@ class GuildPaths:
         payload = {k: v for k, v in payload.items() if k in valid_keys}
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_scheduled_event(
@@ -1470,16 +1427,15 @@ class GuildPaths:
             A guild scheduled event object.
         """
         path = f"/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}"
-        bucket = "GET" + path
         params = {"with_user_count": with_user_count}
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def edit_scheduled_event(
         self,
         guild_id: int,
         guild_scheduled_event_id: int,
         *,
-        reason: str | None = None,
+        reason: Optional[str] = None,
         **payload: Any,
     ) -> ClientResponse:
         """Edit a scheduled event for a guild.
@@ -1501,7 +1457,6 @@ class GuildPaths:
             A guild scheduled event object.
         """
         path = f"/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}"
-        bucket = "PATCH" + path
         valid_keys = (
             "channel_id",
             "entity_metadata",
@@ -1517,11 +1472,11 @@ class GuildPaths:
         payload = {k: v for k, v in payload.items() if k in valid_keys}
 
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_scheduled_event(
-        self, guild_id: int, guild_scheduled_event_id: int, reason: str | None = None
+        self, guild_id: int, guild_scheduled_event_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a scheduled event for a guild.
 
@@ -1540,9 +1495,8 @@ class GuildPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_scheduled_event_users(
@@ -1551,8 +1505,8 @@ class GuildPaths:
         guild_scheduled_event_id: int,
         limit: int,
         with_member: bool,
-        before: int | None = None,
-        after: int | None = None,
+        before: Optional[int] = None,
+        after: Optional[int] = None,
     ) -> ClientResponse:
         """Get the users subscribed to a scheduled event.
 
@@ -1577,7 +1531,6 @@ class GuildPaths:
             A list of guild scheduled event user objects.
         """
         path = f"/guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/users"
-        bucket = "GET" + path
 
         params = {
             "limit": limit,
@@ -1589,7 +1542,7 @@ class GuildPaths:
         if after is not None:
             params["after"] = after
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     """
     Guild Template
@@ -1609,8 +1562,7 @@ class GuildPaths:
             A guild template object.
         """
         path = f"/guilds/templates/{code}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_from_template(self, code: str, name: str) -> ClientResponse:
         """Create a guild from a template.
@@ -1628,11 +1580,10 @@ class GuildPaths:
             A guild object.
         """
         path = f"/guilds/templates/{code}"
-        bucket = "POST" + path
         payload = {
             "name": name,
         }
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def get_guild_templates(self, guild_id: int) -> ClientResponse:
         """Get a guild's templates.
@@ -1648,11 +1599,10 @@ class GuildPaths:
             A list of guild template objects.
         """
         path = f"/guilds/{guild_id}/templates"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_template(
-        self, guild_id: int, name: str, description: str | None = None
+        self, guild_id: int, name: str, description: Optional[str] = None
     ) -> ClientResponse:
         """Create a template for a guild.
 
@@ -1671,13 +1621,12 @@ class GuildPaths:
             A guild template object.
         """
         path = f"/guilds/{guild_id}/templates"
-        bucket = "POST" + path
         payload = {
             "name": name[:100],
         }
         if description is not None:
             payload["description"] = description[:120]
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def sync_template(self, guild_id: int, code: str) -> ClientResponse:
         """Sync a template for a guild.
@@ -1695,11 +1644,10 @@ class GuildPaths:
             A guild template object.
         """
         path = f"/guilds/{guild_id}/templates/{code}"
-        bucket = "PUT" + path
-        return await self._client._request("PUT", path, bucket)
+        return await self._client._request("PUT", path)
 
     async def edit_template(
-        self, guild_id: int, code: str, name: str, description: str | None = None
+        self, guild_id: int, code: str, name: str, description: Optional[str] = None
     ) -> ClientResponse:
         """Edit a template for a guild.
 
@@ -1720,13 +1668,12 @@ class GuildPaths:
             A guild template object.
         """
         path = f"/guilds/{guild_id}/templates/{code}"
-        bucket = "PATCH" + path
         payload = {
             "name": name[:100],
         }
         if description is not None:
             payload["description"] = description[:120]
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def delete_template(self, guild_id: int, code: str) -> ClientResponse:
         """Delete a template for a guild.
@@ -1744,5 +1691,4 @@ class GuildPaths:
             A guild template object.
         """
         path = f"/guilds/{guild_id}/templates/{code}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)

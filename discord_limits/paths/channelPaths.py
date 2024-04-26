@@ -7,6 +7,9 @@ from discord_limits.errors import *
 if TYPE_CHECKING:
     from discord_limits import DiscordClient
 
+import datetime
+from discord_limits import helpers
+
 ISO8601_timestamp = TypeVar("ISO8601_timestamp", str, bytes)
 
 
@@ -35,8 +38,7 @@ class ChannelPaths:
             Channel information.
         """
         path = f"/channels/{channel_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_channel(
         self, channel_id: int, *, reason: Optional[str] = None, **options: Any
@@ -58,7 +60,6 @@ class ChannelPaths:
             A dict containing a channel object.
         """
         path = f"/channels/{channel_id}"
-        bucket = "PATCH" + path
         valid_keys = (
             "name",
             "parent_id",
@@ -81,11 +82,11 @@ class ChannelPaths:
         )
         payload = {k: v for k, v in options.items() if k in valid_keys}
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_channel(
-        self, channel_id: int, reason: str | None = None
+        self, channel_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a channel, or close a private message.
 
@@ -102,18 +103,17 @@ class ChannelPaths:
             The responce from Discord.
         """
         path = f"/channels/{channel_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_channel_messages(
         self,
         channel_id: int,
         limit=50,
-        before: int | None = None,
-        after: int | None = None,
-        around: int | None = None,
+        before: Optional[int] = None,
+        after: Optional[int] = None,
+        around: Optional[int] = None,
     ) -> ClientResponse:
         """Get messages from a channel.
 
@@ -143,7 +143,6 @@ class ChannelPaths:
         if 1 > limit or limit > 100:
             raise InvalidParams("limit must be between 1 and 100")
         path = f"/channels/{channel_id}/messages"
-        bucket = "GET" + path
 
         params = {
             "limit": limit,
@@ -156,7 +155,7 @@ class ChannelPaths:
         if around is not None:
             params["around"] = around
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def get_message(self, channel_id: int, message_id: int) -> ClientResponse:
         """Get a message from a channel.
@@ -174,19 +173,18 @@ class ChannelPaths:
             A message object.
         """
         path = f"/channels/{channel_id}/messages/{message_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_message(
         self,
         channel_id: int,
-        content: str | None = None,
-        tts: bool | None = None,
-        embeds: List[dict] | None = None,
-        allowed_mentions: Any = None,
-        message_reference: Any = None,
-        components: List[Any] | None = None,
-        sticker_ids: List[int] | None = None,
+        content: Optional[str] = None,
+        tts: Optional[bool] = None,
+        embeds: Optional[List[dict]] = None,
+        allowed_mentions: Optional[dict] = None,
+        message_reference: Optional[dict] = None,
+        components: Optional[List[dict]] = None,
+        sticker_ids: Optional[List[int]] = None,
     ) -> ClientResponse:
         """Post a message to a guild text or DM channel.
 
@@ -222,7 +220,6 @@ class ChannelPaths:
         if content is None and embeds is None and sticker_ids is None:
             raise InvalidParams("content, embeds or sticker_ids must be provided")
         path = f"/channels/{channel_id}/messages"
-        bucket = "POST" + path
 
         payload = {}
 
@@ -241,7 +238,7 @@ class ChannelPaths:
         if sticker_ids is not None:
             payload["sticker_ids"] = sticker_ids
 
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def crosspost_message(
         self, channel_id: int, message_id: int
@@ -261,8 +258,7 @@ class ChannelPaths:
             A message object.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/crosspost"
-        bucket = "POST" + path
-        return await self._client._request("POST", path, bucket)
+        return await self._client._request("POST", path)
 
     async def add_reaction(
         self, channel_id: int, message_id: int, emoji: str
@@ -284,8 +280,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me"
-        bucket = "PUT" + path
-        return await self._client._request("PUT", path, bucket)
+        return await self._client._request("PUT", path)
 
     async def remove_own_reaction(
         self, channel_id: int, message_id: int, emoji: str
@@ -307,8 +302,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def remove_reaction(
         self, channel_id: int, message_id: int, emoji: str, member_id: int
@@ -332,8 +326,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/{member_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def get_reactions(
         self,
@@ -341,7 +334,7 @@ class ChannelPaths:
         message_id: int,
         emoji: str,
         limit: int = 25,
-        after: int | None = None,
+        after: Optional[int] = None,
     ) -> ClientResponse:
         """Get a list of users that reacted with this emoji.
 
@@ -364,14 +357,13 @@ class ChannelPaths:
             A list of user objects.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}"
-        bucket = "GET" + path
         params = {
             "limit": limit,
         }
         if after is not None:
             params["after"] = after
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def clear_reactions(self, channel_id: int, message_id: int) -> ClientResponse:
         """Deletes all reactions on a message.
@@ -389,8 +381,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/reactions"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def clear_single_reaction(
         self, channel_id: int, message_id: int, emoji: str
@@ -412,17 +403,16 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def edit_message(
         self,
         channel_id: int,
         message_id: int,
-        content: str | None = None,
-        embeds: List[dict] | None = None,
-        allowed_mentions: Any = None,
-        components: List[Any] | None = None,
+        content: Optional[str] = None,
+        embeds: Optional[List[dict]] = None,
+        allowed_mentions: Optional[dict] = None,
+        components: Optional[List[Any]] = None,
     ) -> ClientResponse:
         """Edit a previously sent message.
 
@@ -447,7 +437,6 @@ class ChannelPaths:
             _description_
         """
         path = f"/channels/{channel_id}/messages/{message_id}"
-        bucket = "PATCH" + path
         payload = {}
 
         if content is not None:
@@ -459,10 +448,10 @@ class ChannelPaths:
         if components is not None:
             payload["components"] = components
 
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def delete_message(
-        self, channel_id: int, message_id: int, reason: str | None = None
+        self, channel_id: int, message_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a message.
 
@@ -481,13 +470,28 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/messages/{message_id}"
-        bucket = "DELETE" + path
+
+        # Special case certain sub-rate limits
+        # https://github.com/discord/discord-api-docs/issues/1092
+        # https://github.com/discord/discord-api-docs/issues/1295
+        difference = datetime.datetime.now(datetime.UTC) - helpers.snowflake_time(
+            int(message_id)
+        )
+        metadata = None
+        if difference <= datetime.timedelta(seconds=10):
+            metadata = "sub-10-seconds"
+        elif difference >= datetime.timedelta(days=14):
+            metadata = "older-than-two-weeks"
+
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE",
+            path,
+            headers={"X-Audit-Log-Reason": reason},
+            metadata=metadata,
         )
 
     async def bulk_delete_messages(
-        self, channel_id: int, message_ids: List[int], reason: str | None = None
+        self, channel_id: int, message_ids: List[int], reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete multiple messages.
 
@@ -505,13 +509,13 @@ class ChannelPaths:
         ClientResponse
             The response from Discord.
         """
+        helpers.check_bulk_delete_ids(message_ids)
         path = f"/channels/{channel_id}/messages/bulk-delete"
-        bucket = "POST" + path
         payload = {
             "messages": message_ids,
         }
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def edit_channel_permissions(
@@ -521,7 +525,7 @@ class ChannelPaths:
         allow: str,
         deny: str,
         type: int,
-        reason: str | None = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Edit the channel permission overwrites for a user or role in a channel.
 
@@ -546,10 +550,9 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/permissions/{overwrite_id}"
-        bucket = "PUT" + path
         payload = {"allow": allow, "deny": deny, "type": type}
         return await self._client._request(
-            "PUT", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PUT", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_channel_invites(self, channel_id: int) -> ClientResponse:
@@ -566,21 +569,20 @@ class ChannelPaths:
             A list of invite objects
         """
         path = f"/channels/{channel_id}/invites"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_channel_invite(
         self,
         channel_id: int,
         *,
-        reason: str | None = None,
+        reason: Optional[str] = None,
         max_age: int = 0,
         max_uses: int = 0,
         temporary: bool = False,
         unique: bool = True,
-        target_type: int | None = None,
-        target_user_id: int | None = None,
-        target_application_id: int | None = None,
+        target_type: Optional[int] = None,
+        target_user_id: Optional[int] = None,
+        target_application_id: Optional[int] = None,
     ) -> ClientResponse:
         """Create a new invite for a channel.
 
@@ -611,7 +613,6 @@ class ChannelPaths:
             An invite object.
         """
         path = f"/channels/{channel_id}/invites"
-        bucket = "POST" + path
         payload = {
             "max_age": max_age,
             "max_uses": max_uses,
@@ -629,11 +630,11 @@ class ChannelPaths:
             payload["target_application_id"] = str(target_application_id)
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_channel_permissions(
-        self, channel_id: int, overwrite_id: int, reason: str | None = None
+        self, channel_id: int, overwrite_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a channel permission overwrite for a user or role in a channel.
 
@@ -652,13 +653,12 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/permissions/{overwrite_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def follow_news_channel(
-        self, channel_id: int, webhook_channel_id: int, reason: str | None = None
+        self, channel_id: int, webhook_channel_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Follow a News Channel to send messages to a target channel.
 
@@ -677,12 +677,11 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/followers"
-        bucket = "POST" + path
         payload = {
             "webhook_channel_id": webhook_channel_id,
         }
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def start_typing(self, channel_id: int) -> ClientResponse:
@@ -699,8 +698,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/typing"
-        bucket = "POST" + path
-        return await self._client._request("POST", path, bucket)
+        return await self._client._request("POST", path)
 
     async def get_pinned_messages(self, channel_id: int) -> ClientResponse:
         """Get a list of pinned messages in a channel.
@@ -716,11 +714,10 @@ class ChannelPaths:
             A list of message objects.
         """
         path = f"/channels/{channel_id}/pins"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def pin_message(
-        self, channel_id: int, message_id: int, reason: str | None = None
+        self, channel_id: int, message_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Pin a message in a channel.
 
@@ -739,13 +736,12 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/pins/{message_id}"
-        bucket = "PUT" + path
         return await self._client._request(
-            "PUT", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "PUT", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def unpin_message(
-        self, channel_id: int, message_id: int, reason: str | None = None
+        self, channel_id: int, message_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Unpin a message in a channel.
 
@@ -764,9 +760,8 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/pins/{message_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def add_group_recipient(
@@ -774,7 +769,7 @@ class ChannelPaths:
         channel_id: int,
         user_id: int,
         access_token: str,
-        nickname: str | None = None,
+        nickname: Optional[str] = None,
     ) -> ClientResponse:
         """Adds a recipient to a Group DM using their access token.
 
@@ -795,9 +790,8 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/recipients/{user_id}"
-        bucket = "PUT" + path
         payload = {"access_token": access_token, "nick": nickname}
-        return await self._client._request("PUT", path, bucket, json=payload)
+        return await self._client._request("PUT", path, json=payload)
 
     async def remove_group_recipient(
         self, channel_id: int, user_id: int
@@ -817,8 +811,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/recipients/{user_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def start_thread_from_message(
         self,
@@ -828,7 +821,7 @@ class ChannelPaths:
         name: str,
         auto_archive_duration: int,
         rate_limit_per_user: int,
-        reason: str | None = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Creates a new thread from an existing message.
 
@@ -853,7 +846,6 @@ class ChannelPaths:
             A channel object.
         """
         path = f"/channels/{channel_id}/messages/{message_id}/threads"
-        bucket = "POST" + path
         payload = {
             "name": name,
             "auto_archive_duration": auto_archive_duration,
@@ -861,7 +853,7 @@ class ChannelPaths:
         }
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def start_thread_without_message(
@@ -871,8 +863,8 @@ class ChannelPaths:
         auto_archive_duration: int,
         type: int,
         invitable: bool = True,
-        rate_limit_per_user: int | None = None,
-        reason: str | None = None,
+        rate_limit_per_user: Optional[int] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Creates a new thread.
 
@@ -899,7 +891,6 @@ class ChannelPaths:
             A channel object.
         """
         path = f"/channels/{channel_id}/threads"
-        bucket = "POST" + path
         payload = {
             "name": name,
             "auto_archive_duration": auto_archive_duration,
@@ -909,7 +900,7 @@ class ChannelPaths:
         }
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def start_thread_in_forum(
@@ -917,9 +908,9 @@ class ChannelPaths:
         channel_id: int,
         name: str,
         auto_archive_duration: int,
-        rate_limit_per_user: int | None = None,
-        reason: str | None = None,
-        **message: Any,
+        message: dict,
+        rate_limit_per_user: Optional[int] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Creates a new thread in a forum channel.
 
@@ -949,7 +940,6 @@ class ChannelPaths:
             Invalid params were given.
         """
         path = f"/channels/{channel_id}/threads"
-        bucket = "POST" + path
         if (
             message.get("content") is None
             and message.get("embeds") is None
@@ -985,7 +975,7 @@ class ChannelPaths:
             k: v for k, v in message.items() if k in valid_message_keys
         }
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def join_thread(self, channel_id: int) -> ClientResponse:
@@ -1002,8 +992,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/thread-members/@me"
-        bucket = "PUT" + path
-        return await self._client._request("PUT", path, bucket)
+        return await self._client._request("PUT", path)
 
     async def add_user_to_thread(self, channel_id: int, user_id: int) -> ClientResponse:
         """Adds another member to a thread.
@@ -1021,8 +1010,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/thread-members/{user_id}"
-        bucket = "PUT" + path
-        return await self._client._request("PUT", path, bucket)
+        return await self._client._request("PUT", path)
 
     async def leave_thread(self, channel_id: int) -> ClientResponse:
         """Removes the current user from a thread.
@@ -1038,8 +1026,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/thread-members/@me"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def remove_user_from_thread(
         self, channel_id: int, user_id: int
@@ -1059,8 +1046,7 @@ class ChannelPaths:
             The response from Discord.
         """
         path = f"/channels/{channel_id}/thread-members/{user_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def get_thread_member(self, channel_id: int, user_id: int) -> ClientResponse:
         """Gets a thread member.
@@ -1078,8 +1064,7 @@ class ChannelPaths:
             A thread member object.
         """
         path = f"/channels/{channel_id}/thread-members/{user_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_thread_members(self, channel_id: int) -> ClientResponse:
         """Gets all thread members.
@@ -1095,11 +1080,13 @@ class ChannelPaths:
             A list of thread member objects.
         """
         path = f"/channels/{channel_id}/thread-members"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_public_archived_threads(
-        self, channel_id: int, before: ISO8601_timestamp | None = None, limit: int = 50
+        self,
+        channel_id: int,
+        before: Optional[ISO8601_timestamp] = None,
+        limit: int = 50,
     ) -> ClientResponse:
         """Returns archived threads in the channel that are public.
 
@@ -1118,16 +1105,15 @@ class ChannelPaths:
             A list of archived threads in the channel that are public.
         """
         path = f"/channels/{channel_id}/threads/archived/public"
-        bucket = "GET" + path
 
         params = {}
         if before:
             params["before"] = before
         params["limit"] = limit
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def get_private_archived_threads(
-        self, channel_id: int, before: ISO8601_timestamp | None = None, limit=50
+        self, channel_id: int, before: Optional[ISO8601_timestamp] = None, limit=50
     ) -> ClientResponse:
         """Returns archived threads in the channel that are private.
 
@@ -1146,16 +1132,15 @@ class ChannelPaths:
             A list of archived threads in the channel that are private.
         """
         path = f"/channels/{channel_id}/threads/archived/private"
-        bucket = "GET" + path
 
         params = {}
         if before:
             params["before"] = before
         params["limit"] = limit
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def get_joined_private_archived_threads(
-        self, channel_id: int, before: int | None = None, limit: int = 50
+        self, channel_id: int, before: Optional[int] = None, limit: int = 50
     ) -> ClientResponse:
         """Returns archived joined threads in the channel that are private.
 
@@ -1174,9 +1159,8 @@ class ChannelPaths:
             A list of archived joined threads in the channel that are private.
         """
         path = f"/channels/{channel_id}/users/@me/threads/archived/private"
-        bucket = "GET" + path
         params = {}
         if before:
             params["before"] = before
         params["limit"] = limit
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)

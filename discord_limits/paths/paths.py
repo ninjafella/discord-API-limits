@@ -1,4 +1,8 @@
 from aiohttp import ClientResponse
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from discord_limits.client import DiscordClient
 
 from discord_limits.errors import *
 
@@ -50,22 +54,44 @@ class Paths:
         The users paths.
     webhook : WebhookPaths
         The webhook paths.
-    """  
+    """
 
     def __init__(self, client):
-        self._client = client
-        self.application: ApplicationPaths = ApplicationPaths(self._client) #: ApplicationPaths: The application paths.
-        self.audit_logs: AuditPaths = AuditPaths(self._client) #: AuditPaths: The audit log paths.
-        self.auto_moderation: AutoModerationPaths = AutoModerationPaths(self._client) #: AutoModerationPaths: The auto moderation paths
-        self.channel: ChannelPaths = ChannelPaths(self._client) #: ChannelPaths: The channel paths.
-        self.emoji: EmojiPaths = EmojiPaths(self._client) #: EmojiPaths: The emoji paths.
-        self.guild: GuildPaths = GuildPaths(self._client) #: GuildPaths: The guild paths.
-        self.interactions: InteractionsPaths = InteractionsPaths(self._client) #: InteractionsPaths: The interactions paths
-        self.invite: InvitePaths = InvitePaths(self._client) #: InvitePaths: The invite paths.
-        self.stage: StagePaths = StagePaths(self._client) #: StagePaths: The stage paths.
-        self.sticker: StickerPaths = StickerPaths(self._client) #: StickerPaths: The sticker paths.
-        self.user: UserPaths = UserPaths(self._client) #: UserPaths: The users paths.
-        self.webhook: WebhookPaths = WebhookPaths(self._client) #: WebhookPaths: The webhook paths.
+        self._client: "DiscordClient" = client
+        self.application: ApplicationPaths = ApplicationPaths(
+            self._client
+        )  #: ApplicationPaths: The application paths.
+        self.audit_logs: AuditPaths = AuditPaths(
+            self._client
+        )  #: AuditPaths: The audit log paths.
+        self.auto_moderation: AutoModerationPaths = AutoModerationPaths(
+            self._client
+        )  #: AutoModerationPaths: The auto moderation paths
+        self.channel: ChannelPaths = ChannelPaths(
+            self._client
+        )  #: ChannelPaths: The channel paths.
+        self.emoji: EmojiPaths = EmojiPaths(
+            self._client
+        )  #: EmojiPaths: The emoji paths.
+        self.guild: GuildPaths = GuildPaths(
+            self._client
+        )  #: GuildPaths: The guild paths.
+        self.interactions: InteractionsPaths = InteractionsPaths(
+            self._client
+        )  #: InteractionsPaths: The interactions paths
+        self.invite: InvitePaths = InvitePaths(
+            self._client
+        )  #: InvitePaths: The invite paths.
+        self.stage: StagePaths = StagePaths(
+            self._client
+        )  #: StagePaths: The stage paths.
+        self.sticker: StickerPaths = StickerPaths(
+            self._client
+        )  #: StickerPaths: The sticker paths.
+        self.user: UserPaths = UserPaths(self._client)  #: UserPaths: The users paths.
+        self.webhook: WebhookPaths = WebhookPaths(
+            self._client
+        )  #: WebhookPaths: The webhook paths.
 
     async def list_voice_regions(self) -> ClientResponse:
         """Get a list of voice regions.
@@ -76,8 +102,7 @@ class Paths:
             A list of voice region objects.
         """
         path = "/voice/regions"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_gateway(self) -> ClientResponse:
         """Get the gateway URL.
@@ -88,8 +113,7 @@ class Paths:
             The response from Discord.
         """
         path = "/gateway"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket, auth=False)
+        return await self._client._request("GET", path, auth=False)
 
     async def get_bot_gateway(self) -> ClientResponse:
         """Get the gateway URL for a bot.
@@ -100,8 +124,7 @@ class Paths:
             The response from Discord.
         """
         path = "/gateway/bot"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def application_info(self) -> ClientResponse:
         """Get the application info.
@@ -112,8 +135,7 @@ class Paths:
             An application object.
         """
         path = "/oauth2/applications/@me"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def authorisation_info(self, bearer_token: str) -> ClientResponse:
         """Get the authorisation info.
@@ -129,11 +151,9 @@ class Paths:
             The response from Discord.
         """
         path = "/oauth2/@me"
-        bucket = "GET" + path
         return await self._client._request(
             "GET",
             path,
-            bucket,
             headers={"Authorization": f"Bearer {bearer_token}"},
             auth=False,
         )  # auth is False as a bearer_token is used

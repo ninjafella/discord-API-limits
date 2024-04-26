@@ -33,8 +33,7 @@ class AutoModerationPaths:
             List of auto moderation rule objects.
         """
         path = f"/guilds/{guild_id}/auto-moderation/rules"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_auto_moderation_rule(
         self, guild_id: int, rule_id: int
@@ -54,8 +53,7 @@ class AutoModerationPaths:
             A auto moderation rule object.
         """
         path = f"/guilds/{guild_id}/auto-moderation/rules/{rule_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def create_auto_moderation_rule(
         self, guild_id: int, **options: Any
@@ -73,7 +71,6 @@ class AutoModerationPaths:
             A auto moderation rule object.
         """
         path = f"/guilds/{guild_id}/auto-moderation/rules"
-        bucket = "POST" + path
         valid_keys = (
             "name",
             "event_type",
@@ -85,7 +82,7 @@ class AutoModerationPaths:
             "exempt_channels",
         )
         payload = {k: v for k, v in options.items() if k in valid_keys}
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def modify_auto_moderation_rule(
         self, guild_id: int, rule_id: int, **options: Any
@@ -105,7 +102,6 @@ class AutoModerationPaths:
             A auto moderation rule object.
         """
         path = f"/guilds/{guild_id}/auto-moderation/rules/{rule_id}"
-        bucket = "PATCH" + path
         valid_keys = (
             "name",
             "event_type",
@@ -116,7 +112,7 @@ class AutoModerationPaths:
             "exempt_channels",
         )
         payload = {k: v for k, v in options.items() if k in valid_keys}
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def delete_auto_moderation_rule(
         self, guild_id: int, rule_id: int
@@ -136,5 +132,4 @@ class AutoModerationPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/auto-moderation/rules/{rule_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)

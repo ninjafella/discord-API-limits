@@ -1,5 +1,5 @@
 [![Documentation Status]](https://discord-limits.readthedocs.io/en/latest/?badge=latest)
-[![Version](https://img.shields.io/badge/Version-v1.1.2-blue)](https://img.shields.io/badge/Version-v1.1.2-blue)
+[![Version](https://img.shields.io/badge/Version-v2.0.1-blue)](https://img.shields.io/badge/Version-v2.0.1-blue)
 
 # discord_limits
 
@@ -13,27 +13,21 @@
 
 ```py
 import discord_limits
-import os
 import asyncio
 
-limitsClient = discord_limits.DiscordClient(os.environ.get('TOKEN'))
+limits_client = discord_limits.DiscordClient("YOUR_TOKEN", "bot")
 
 async def main():
-    await limitsClient.create_message(123456789012345678, content='Hello World!')
-
+    await limits_client.channel.create_message("CHANNEL_ID", "Hello World!")
 
 asyncio.run(main())
+
 ```
 
 ---
 ### Requires:
 - [aiolimiter](https://pypi.org/project/aiolimiter/)
 - [aiohttp](https://pypi.org/project/aiohttp/)
-
----
-### Based off of:
-- [unbelipy](https://github.com/chrisdewa/unbelipy)
-- [discord.py](https://github.com/Rapptz/discord.py)
 
 
 [def]: https://readthedocs.org/projects/discord-limits/badge/?version=latest

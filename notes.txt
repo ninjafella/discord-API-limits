@@ -6,21 +6,21 @@ https://github.com/mjpieters/aiolimiter
 --- Starting the venv ---
 https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/26/python-virtual-env/
 
-cd /d D:\OneDrive\Desktop\discord-API-limits
+cd C:\Users\henry\OneDrive\Desktop\discord-API-limits
 
 venv\Scripts\activate
 
 
 --- Build the project ---
 
-cd /d D:\OneDrive\Desktop\discord-API-limits
+cd C:\Users\henry\OneDrive\Desktop\discord-API-limits
 
 python setup.py sdist
 
 
 --- Install the project ---
 
-cd /d D:\OneDrive\Desktop\discord-API-limits\dist
+cd C:\Users\henry\OneDrive\Desktop\discord-API-limits\dist
 
 pip3 install <filename.tar.gz>
 
@@ -29,6 +29,6 @@ pip3 install <filename.tar.gz>
 
 https://towardsdatascience.com/how-to-upload-your-python-package-to-pypi-de1b363a1b3
 
-cd /d D:\OneDrive\Desktop\discord-API-limits
+cd C:\Users\henry\OneDrive\Desktop\discord-API-limits
 venv\Scripts\activate
 twine upload dist/*

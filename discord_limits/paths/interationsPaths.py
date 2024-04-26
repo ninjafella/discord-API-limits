@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from aiohttp import ClientResponse
 
@@ -24,7 +24,7 @@ class InteractionsPaths:
         interaction_id: int,
         interaction_token: str,
         type: int,
-        data: dict | None = None,
+        data: Optional[dict] = None,
     ) -> ClientResponse:
         """Create an interaction response.
 
@@ -45,11 +45,10 @@ class InteractionsPaths:
             The response from Discord.
         """
         path = f"/interactions/{interaction_id}/{interaction_token}/callback"
-        bucket = "POST" + path
         payload = {"type": type}
         if data is not None:
             payload["data"] = data  # type: ignore
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def get_original_interaction_response(
         self, application_id: int, interaction_token: str
@@ -69,17 +68,16 @@ class InteractionsPaths:
             The response from Discord.
         """
         path = f"/webhooks/{application_id}/{interaction_token}/messages/@original"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_original_interaction_response(
         self,
         application_id: int,
         interaction_token: str,
-        content: str | None = None,
-        embeds: List[dict] | None = None,
+        content: Optional[Optional[str]] = None,
+        embeds: Optional[List[dict]] = None,
         allowed_mentions: Any = None,
-        components: List[Any] | None = None,
+        components: Optional[List[Any]] = None,
     ) -> ClientResponse:
         """Edit the original interaction response.
 
@@ -104,7 +102,6 @@ class InteractionsPaths:
             A message object.
         """
         path = f"/webhooks/{application_id}/{interaction_token}/messages/@original"
-        bucket = "PATCH" + path
 
         payload = {
             "content": content,
@@ -113,7 +110,7 @@ class InteractionsPaths:
             "components": components,
         }
 
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def delete_original_interaction_response(
         self, application_id: int, interaction_token: str
@@ -133,18 +130,17 @@ class InteractionsPaths:
             The response from Discord.
         """
         path = f"/webhooks/{application_id}/{interaction_token}/messages/@original"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket)
+        return await self._client._request("DELETE", path)
 
     async def create_followup_message(
         self,
         application_id: int,
         interaction_token: str,
-        content: str | None = None,
-        tts: bool | None = None,
-        embeds: List[dict] | None = None,
+        content: Optional[str] = None,
+        tts: Optional[bool] = None,
+        embeds: Optional[List[dict]] = None,
         allowed_mentions: Any = None,
-        components: List[Any] | None = None,
+        components: Optional[List[Any]] = None,
     ) -> ClientResponse:
         """Create a followup message.
 
@@ -171,7 +167,6 @@ class InteractionsPaths:
             A message object.
         """
         path = f"/webhooks/{application_id}/{interaction_token}"
-        bucket = "POST" + path
 
         payload = {}
 
@@ -186,7 +181,7 @@ class InteractionsPaths:
         if components is not None:
             payload["components"] = components
 
-        return await self._client._request("POST", path, bucket, json=payload)
+        return await self._client._request("POST", path, json=payload)
 
     async def get_followup_message(
         self, application_id: int, interaction_token: str, message_id: int
@@ -208,18 +203,17 @@ class InteractionsPaths:
             The response from Discord.
         """
         path = f"/webhooks/{application_id}/{interaction_token}/messages/{message_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def edit_followup_message(
         self,
         application_id: int,
         interaction_token: str,
         message_id: int,
-        content: str | None = None,
-        embeds: List[dict] | None = None,
+        content: Optional[str] = None,
+        embeds: Optional[List[dict]] = None,
         allowed_mentions: Any = None,
-        components: List[Any] | None = None,
+        components: Optional[List[Any]] = None,
     ) -> ClientResponse:
         """Edit a followup message.
 
@@ -246,7 +240,6 @@ class InteractionsPaths:
             A message object.
         """
         path = f"/webhooks/{application_id}/{interaction_token}/messages/{message_id}"
-        bucket = "PATCH" + path
 
         payload = {
             "content": content,
@@ -255,14 +248,14 @@ class InteractionsPaths:
             "components": components,
         }
 
-        return await self._client._request("PATCH", path, bucket, json=payload)
+        return await self._client._request("PATCH", path, json=payload)
 
     async def delete_followup_message(
         self,
         application_id: int,
         interaction_token: str,
         message_id: int,
-        thread_id: int | None = None,
+        thread_id: Optional[int] = None,
     ) -> ClientResponse:
         """Delete a followup message.
 
@@ -286,5 +279,4 @@ class InteractionsPaths:
         if thread_id is not None:
             payload["thread_id"] = thread_id
         path = f"/webhooks/{application_id}/{interaction_token}/messages/{message_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket, json=payload)
+        return await self._client._request("DELETE", path, json=payload)

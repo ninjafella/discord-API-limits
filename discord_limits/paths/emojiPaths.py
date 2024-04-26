@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from aiohttp import ClientResponse
 
@@ -33,8 +33,7 @@ class EmojiPaths:
             A list of emoji objects.
         """
         path = f"/guilds/{guild_id}/emojis"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_guild_emoji(self, guild_id: int, emoji_id: int) -> ClientResponse:
         """Gets an emoji in a guild.
@@ -52,8 +51,7 @@ class EmojiPaths:
             An emoji object.
         """
         path = f"/guilds/{guild_id}/emojis/{emoji_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     """
     async def create_guild_emoji(self, guild_id: int, name, image, *, roles = None, reason: str = None) -> ClientResponse:
@@ -71,9 +69,9 @@ class EmojiPaths:
         self,
         guild_id: int,
         emoji_id: int,
-        name: str | None = None,
-        roles: List[int] | None = None,
-        reason: str | None = None,
+        name: Optional[str] = None,
+        roles: Optional[List[int]] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Edits a custom emoji.
 
@@ -96,18 +94,17 @@ class EmojiPaths:
             An emoji object.
         """
         path = f"/guilds/{guild_id}/emojis/{emoji_id}"
-        bucket = "PATCH" + path
         payload = {}
         if name is not None:
             payload["name"] = name
         if roles is not None:
             payload["roles"] = roles
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_custom_emoji(
-        self, guild_id: int, emoji_id: int, reason: str | None = None
+        self, guild_id: int, emoji_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Deletes a custom emoji.
 
@@ -126,7 +123,6 @@ class EmojiPaths:
             The response from Discord.
         """
         path = f"/guilds/{guild_id}/emojis/{emoji_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )

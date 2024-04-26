@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from aiohttp import ClientResponse
 
@@ -25,7 +25,7 @@ class InvitePaths:
         *,
         with_counts: bool = True,
         with_expiration: bool = True,
-        guild_scheduled_event_id: int | None = None,
+        guild_scheduled_event_id: Optional[int] = None,
     ) -> ClientResponse:
         """Get an invite.
 
@@ -46,7 +46,6 @@ class InvitePaths:
             An invite object.
         """
         path = f"/invites/{invite_id}"
-        bucket = "GET" + path
         params = {
             "with_counts": with_counts,
             "with_expiration": with_expiration,
@@ -55,10 +54,10 @@ class InvitePaths:
         if guild_scheduled_event_id:
             params["guild_scheduled_event_id"] = guild_scheduled_event_id  # type: ignore
 
-        return await self._client._request("GET", path, bucket, params=params)
+        return await self._client._request("GET", path, params=params)
 
     async def delete_invite(
-        self, invite_id: str, reason: str | None = None
+        self, invite_id: str, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete an invite.
 
@@ -75,7 +74,6 @@ class InvitePaths:
             An invite object.
         """
         path = f"/invites/{invite_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )

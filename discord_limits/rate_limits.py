@@ -1,99 +1,53 @@
 import asyncio
-from datetime import datetime
-from typing import Dict, List
+import datetime
+import stat
+from typing import Dict, Optional
 
 from aiohttp import ClientResponse
 from aiolimiter import AsyncLimiter
+from .errors import *
 
 
 class BucketHandler:
-    """
-    Handles bucket specific rate limits
-    {bucket_name: BucketHandler}
-    """
+    limit: Optional[int] = None  # The rate limit
+    remaining: Optional[int] = None  # Remaining requests
+    reset: Optional[datetime.datetime] = None  # When the rate limit resets
+    retry_after: Optional[float] = None  # How long to wait before retrying the request
+    bucket_hash: str = ""  # The bucket hash from Discord
+    lock: asyncio.Event = (
+        asyncio.Event()
+    )  # Used to lock the bucket if a rate limit is hit
 
-    limit: int | None = None
-    remaining: int | None = None
-    reset: datetime | None = None
-    retry_after: float | None = None
-    prevent_429: bool = False
-    cond = None
+    def __init__(self):
+        self.lock.set()
 
-    def __init__(self, bucket: str):
-        self.bucket = bucket
-
-    def __repr__(self):
-        return (
-            f"RateLimit(bucket={self.bucket}, limit={self.limit}, remaining={self.remaining}, "
-            f"reset={self.reset}, retry_after={self.retry_after})"
-        )
-
-    def check_limit_headers(self, r: ClientResponse):
-        limits = {}
-        header_attrs = {
-            "X-RateLimit-Limit": "limit",
-            "X-RateLimit-Remaining": "remaining",
-            "X-RateLimit-Reset": "reset",
-        }
-        for key in header_attrs:
-            value = r.headers.get(key)
-            if value is not None:
-                if key == "X-RateLimit-Reset":
-                    value = datetime.utcfromtimestamp(float(value))
-            limits[header_attrs[key]] = value
-        for k, v in limits.items():
-            setattr(self, k, v)
+    async def trigger_lock(self):
+        self.lock.clear()
+        await asyncio.sleep(self.retry_after)  # type: ignore
+        self.lock.set()
 
     async def __aenter__(self):
-        self.cond = self.cond or asyncio.Condition(loop=asyncio.get_running_loop())  # type: ignore
-        if self.prevent_429 is True:
-            await self.cond.acquire()
-            if self.remaining is not None and self.remaining == 0:
-                now = datetime.utcnow()
-                to_wait = (self.reset - now).total_seconds() + 1  # type: ignore
-                await asyncio.sleep(to_wait)
+        await self.lock.wait()
+        if self.remaining is not None and self.remaining == 0:
+            now = datetime.datetime.now(datetime.UTC)
+            to_wait = (self.reset - now).total_seconds() + 1  # type: ignore
+            await asyncio.sleep(to_wait)
         return self
 
     async def __aexit__(self, *args):
-        if self.prevent_429 is True:
-            self.cond.release()  # type: ignore
-
-
-class AsyncNonLimiter:
-    async def __aenter__(self):
-        pass
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
         pass
 
 
 class ClientRateLimits:
-    buckets: Dict[str, BucketHandler] = dict()
+    buckets: Dict[str, BucketHandler] = dict()  # {bucket_hash: BucketHandler}
+    bucket_relations: Dict[str, str] = dict()  # {path: bucket_hash}
 
-    def __init__(self, prevent_rate_limits: bool):
-        self.global_limiter = (
-            AsyncLimiter(50, 1) if prevent_rate_limits is True else AsyncNonLimiter()
-        )
+    def __init__(self):
+        self.global_limiter = AsyncLimiter(50, 1)  # 50 requests per second
 
-    def currently_limited(self) -> List[str]:
-        """
-        Returns:
-            Returns a list of the buckets (str) that are currently being limited.
-        """
-        now = datetime.utcnow()
-        limited = [
-            k
-            for k, v in self.buckets.items()
-            if v.reset is not None and v.reset > now and v.remaining == 0
-        ]
-        return limited
+    def update_bucket_relations(self, old_hash: str, new_hash: str):
+        for path, bucket_hash in self.bucket_relations.items():
+            if bucket_hash == old_hash:
+                self.bucket_relations[path] = new_hash
 
-    def any_limited(self) -> bool:
-        """
-        Returns:
-            True if any bucket is being rate limited
-        """
-        return any(self.currently_limited())
-
-    def is_limited(self, bucket: str):
-        return bucket in self.currently_limited()
+        self.buckets[new_hash] = self.buckets.pop(old_hash)

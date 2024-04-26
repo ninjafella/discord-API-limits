@@ -1,4 +1,5 @@
 import datetime
+from .errors import OldMessageID
 
 
 def snowflake_time(id: int, /) -> datetime.datetime:
@@ -19,3 +20,25 @@ def snowflake_time(id: int, /) -> datetime.datetime:
     """
     timestamp = ((id >> 22) + 1420070400000) / 1000
     return datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
+
+
+def check_bulk_delete_ids(message_ids: list[int]):
+    """Check if the messages are younger than 14 days.
+
+    Parameters
+    ----------
+    message_ids : list[int]
+        A list of message IDs to check.
+
+    Raises
+    ------
+    ValueError
+        If the message ID is older than 14 days.
+    """
+    now = datetime.datetime.now(datetime.timezone.utc)
+    for message in message_ids:
+        if (now - snowflake_time(int(message))) >= datetime.timedelta(days=14):
+            raise OldMessageID(
+                message,
+                f"The message ID {message} is older than 14 days and cannot be deleted in bulk.",
+            )

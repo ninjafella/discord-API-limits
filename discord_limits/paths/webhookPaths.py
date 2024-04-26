@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from aiohttp import ClientResponse
 
@@ -20,7 +20,7 @@ class WebhookPaths:
         self._client = client
 
     async def create_webhook(
-        self, channel_id: int, name: str, reason: str | None = None
+        self, channel_id: int, name: str, reason: Optional[str] = None
     ) -> ClientResponse:
         """Create a webhook.
 
@@ -39,13 +39,12 @@ class WebhookPaths:
             A webhook object.
         """
         path = f"/channels/{channel_id}/webhooks"
-        bucket = "POST" + path
         payload = {
             "name": name,
         }
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "POST", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def get_channel_webhooks(self, channel_id: int) -> ClientResponse:
@@ -62,8 +61,7 @@ class WebhookPaths:
             A list of webhook objects.
         """
         path = f"/channels/{channel_id}/webhooks"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_guild_webhooks(self, guild_id: int) -> ClientResponse:
         """Get a list of webhooks for a guild.
@@ -79,8 +77,7 @@ class WebhookPaths:
             A list of webhook objects.
         """
         path = f"/guilds/{guild_id}/webhooks"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_webhook(self, webhook_id: int) -> ClientResponse:
         """Get a webhook.
@@ -96,8 +93,7 @@ class WebhookPaths:
             A webhook object.
         """
         path = f"/webhooks/{webhook_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket)
+        return await self._client._request("GET", path)
 
     async def get_webhook_with_token(
         self, webhook_id: int, webhook_token: str
@@ -117,15 +113,14 @@ class WebhookPaths:
             A webhook object.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket, auth=False)
+        return await self._client._request("GET", path, auth=False)
 
     async def edit_webhook(
         self,
         webhook_id: int,
-        name: str | None = None,
-        channel_id: int | None = None,
-        reason: str | None = None,
+        name: Optional[str] = None,
+        channel_id: Optional[int] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Edit a webhook.
 
@@ -146,7 +141,6 @@ class WebhookPaths:
             A webhook object.
         """
         path = f"/webhooks/{webhook_id}"
-        bucket = "PATCH" + path
         payload = {}
         if name is not None:
             payload["name"] = name
@@ -154,15 +148,15 @@ class WebhookPaths:
             payload["channel_id"] = channel_id
 
         return await self._client._request(
-            "PATCH", path, bucket, json=payload, headers={"X-Audit-Log-Reason": reason}
+            "PATCH", path, json=payload, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def edit_webhook_with_token(
         self,
         webhook_id: int,
         webhook_token: str,
-        name: str | None = None,
-        reason: str | None = None,
+        name: Optional[str] = None,
+        reason: Optional[str] = None,
     ) -> ClientResponse:
         """Edit a webhook with a token.
 
@@ -183,7 +177,6 @@ class WebhookPaths:
             A webhook object.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}"
-        bucket = "PATCH" + path
         payload = {}
 
         if name is not None:
@@ -192,14 +185,13 @@ class WebhookPaths:
         return await self._client._request(
             "PATCH",
             path,
-            bucket,
             json=payload,
             auth=False,
             headers={"X-Audit-Log-Reason": reason},
         )
 
     async def delete_webhook(
-        self, webhook_id: int, reason: str | None = None
+        self, webhook_id: int, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a webhook.
 
@@ -216,13 +208,12 @@ class WebhookPaths:
             The response from Discord.
         """
         path = f"/webhooks/{webhook_id}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def delete_webhook_with_token(
-        self, webhook_id: int, webhook_token: str, reason: str | None = None
+        self, webhook_id: int, webhook_token: str, reason: Optional[str] = None
     ) -> ClientResponse:
         """Delete a webhook with a token.
 
@@ -241,9 +232,8 @@ class WebhookPaths:
             The response from Discord.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}"
-        bucket = "DELETE" + path
         return await self._client._request(
-            "DELETE", path, bucket, auth=False, headers={"X-Audit-Log-Reason": reason}
+            "DELETE", path, auth=False, headers={"X-Audit-Log-Reason": reason}
         )
 
     async def execute_webhook(
@@ -251,14 +241,14 @@ class WebhookPaths:
         webhook_id: int,
         webhook_token: str,
         wait: bool = False,
-        thread_id: int | None = None,
-        content: str | None = None,
-        username: str | None = None,
-        avatar_url: str | None = None,
+        thread_id: Optional[int] = None,
+        content: Optional[str] = None,
+        username: Optional[str] = None,
+        avatar_url: Optional[str] = None,
         tts: bool = False,
-        embeds: List[dict] | None = None,
+        embeds: Optional[List[dict]] = None,
         allowed_mentions: Any = None,
-        components: List[Any] | None = None,
+        components: Optional[List[Any]] = None,
     ) -> ClientResponse:
         """Execute a webhook.
 
@@ -298,7 +288,6 @@ class WebhookPaths:
             If content or embeds are provided.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}"
-        bucket = "POST" + path
         if content is None and embeds is None:
             raise InvalidParams("content or embeds must be provided")
 
@@ -326,7 +315,7 @@ class WebhookPaths:
             payload["components"] = components
 
         return await self._client._request(
-            "POST", path, bucket, json=payload, params=params, auth=False
+            "POST", path, json=payload, params=params, auth=False
         )
 
     async def get_webhook_message(
@@ -334,7 +323,7 @@ class WebhookPaths:
         webhook_id: int,
         webhook_token: str,
         message_id: int,
-        thread_id: int | None = None,
+        thread_id: Optional[int] = None,
     ) -> ClientResponse:
         """Get a message from a webhook.
 
@@ -355,19 +344,18 @@ class WebhookPaths:
             A message object.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
-        bucket = "GET" + path
-        return await self._client._request("GET", path, bucket, auth=False)
+        return await self._client._request("GET", path, auth=False)
 
     async def edit_webhook_message(
         self,
         webhook_id: int,
         webhook_token: str,
         message_id: int,
-        thread_id: int | None = None,
-        content: str | None = None,
-        embeds: List[dict] | None = None,
+        thread_id: Optional[int] = None,
+        content: Optional[str] = None,
+        embeds: Optional[List[dict]] = None,
         allowed_mentions: Any = None,
-        components: List[Any] | None = None,
+        components: Optional[List[Any]] = None,
     ) -> ClientResponse:
         """Edit a message from a webhook.
 
@@ -396,7 +384,6 @@ class WebhookPaths:
             A message object.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
-        bucket = "PATCH" + path
 
         payload = {
             "content": content,
@@ -404,9 +391,7 @@ class WebhookPaths:
             "allowed_mentions": allowed_mentions,
             "components": components,
         }
-        return await self._client._request(
-            "PATCH", path, bucket, json=payload, auth=False
-        )
+        return await self._client._request("PATCH", path, json=payload, auth=False)
 
     async def delete_webhook_message(
         self, webhook_id: int, webhook_token: str, message_id: int
@@ -428,5 +413,4 @@ class WebhookPaths:
             The response from Discord.
         """
         path = f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
-        bucket = "DELETE" + path
-        return await self._client._request("DELETE", path, bucket, auth=False)
+        return await self._client._request("DELETE", path, auth=False)
