@@ -6,7 +6,6 @@ from sys import version_info as python_version
 from aiohttp import ClientResponse, ClientSession
 from aiohttp import __version__ as aiohttp_version
 from aiolimiter import AsyncLimiter
-from requests import head
 
 from . import __version__
 from .errors import *
