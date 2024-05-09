@@ -8,7 +8,7 @@ setup(
     packages=find_packages(
         include=["discord_limits", "discord_limits.paths", "discord_limits.objects"]
     ),
-    version="2.0.2",
+    version="2.0.3",
     description="Make Discord API calls without having to worry about ratelimits.",
     author="ninjafella",
     license="MIT",
